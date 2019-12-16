@@ -8,7 +8,7 @@ The pyatmos package is an archive of scientific routines that can be used to han
 pip install pyatmos
 ```
 
-## Examples
+## How to Use
 
 ```python
 from pyatmos.msise import download_sw,read_sw
