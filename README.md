@@ -1,6 +1,6 @@
 # Welcome to ATMOS
 
-The pyatmos package is an archive of scientific routines that can be used to handle atmospheric models. Currently, only nrlmsise00 is feasible, which is valid from altitude z = 0..1000 km.
+The pyatmos package is an archive of scientific routines that can be used to handle atmospheric models. Currently, only nrlmsise00 is feasible.
 
 ## How to Install
 
@@ -63,6 +63,10 @@ print(para_input)
 print(para_output)
 {'d': {'He': 74934329990.0412, 'O': 71368139.39199762, 'N2': 104.72048033793158, 'O2': 0.09392848471935447, 'AR': 1.3231114543012155e-07, 'RHO': 8.914971667362366e-16, 'H': 207405192640.34592, 'N': 3785341.821909535, 'ANM O': 1794317839.638502}, 't': {'TINF': 646.8157488121493, 'TG': 646.8157488108872}}
 ```
+## Next release
+- Complete the help documentation
+- Improve the code structure to make it easier to read
+- Add other atmospheric models
 
 ## Reference
 
