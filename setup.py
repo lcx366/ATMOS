@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pyatmos',
-    version='1.0',
+    version='1.0.1',
     long_description_content_type='text/markdown',
     description='A package to estimate the atmosphere parameters',
     long_description=open('README.md', 'rb').read().decode('utf-8'),
@@ -18,6 +18,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         ],
     packages=setuptools.find_packages(),
+    include_package_data=True,
     package_data = {
         'pyatmos.data': ['*.npz'],
         },
