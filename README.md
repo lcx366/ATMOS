@@ -1,6 +1,6 @@
 Atmospheric model for Python. Currently, only nrlmsise00 is feasible, which is valid from altitude z = 0..1000 km.
 
-## Install
+## How to Install
 
 ```sh
 pip install pyatmos
