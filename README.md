@@ -1,4 +1,6 @@
-Atmospheric model for Python. Currently, only nrlmsise00 is feasible, which is valid from altitude z = 0..1000 km.
+# Welcome to ATMOS
+
+The pyatmos package is an archive of scientific routines that can be used to handle atmospheric models. Currently, only nrlmsise00 is feasible, which is valid from altitude z = 0..1000 km.
 
 ## How to Install
 
