@@ -492,14 +492,14 @@ def globe7(p,inputp,flags):
      (p[100]*plg[1] + p[101]*plg[6] + p[102]*plg[15])*cd14*flags['swc'][4] +
      (p[121]*plg[2] + p[122]*plg[7] + p[123]*plg[16])*flags['swc'][6]*np.cos(hr*(tloc - p[124])))
 
-    if flags['sw'][9] and inputp['g_long'] > -1000:
+    if flags['sw'][9] and inputp['g_lon'] > -1000:
         # longitudinal
         if flags['sw'][10]:
             t[10] = (1 + p[80]*dfa*flags['swc'][0])*((p[64]*plg[4] + p[65]*plg[11] + p[66]*plg[22]\
                     + p[103]*plg[2] + p[104]*plg[7] + p[105]*plg[16]\
-                    + flags['swc'][4]*(p[109]*plg[2] + p[110]*plg[7] + p[111]*plg[16])*cd14)*np.cos(np.deg2rad(inputp['g_long'])) \
+                    + flags['swc'][4]*(p[109]*plg[2] + p[110]*plg[7] + p[111]*plg[16])*cd14)*np.cos(np.deg2rad(inputp['g_lon'])) \
                     +(p[90]*plg[4]+p[91]*plg[11]+p[92]*plg[22] + p[106]*plg[2]+p[107]*plg[7]+p[108]*plg[16]\
-                    + flags['swc'][4]*(p[112]*plg[2] + p[113]*plg[7] + p[114]*plg[16])*cd14)*np.sin(np.deg2rad(inputp['g_long'])))
+                    + flags['swc'][4]*(p[112]*plg[2] + p[113]*plg[7] + p[114]*plg[16])*cd14)*np.sin(np.deg2rad(inputp['g_lon'])))
 
         # ut and mixed ut, longitude 
         if flags['sw'][11]:
@@ -507,22 +507,22 @@ def globe7(p,inputp,flags):
             (1 + p[119]*plg[1]*flags['swc'][4]*cd14)*\
             ((p[68]*plg[1] + p[69]*plg[6] + p[70]*plg[15])*np.cos(sr*(inputp['sec'] - p[71])))
             t[11] += flags['swc'][10]*(p[76]*plg[8] + p[77]*plg[17] + p[78]*plg[30])*\
-            np.cos(sr*(inputp['sec'] - p[79]) + 2*np.deg2rad(inputp['g_long']))*(1 + p[137]*dfa*flags['swc'][0])
+            np.cos(sr*(inputp['sec'] - p[79]) + 2*np.deg2rad(inputp['g_lon']))*(1 + p[137]*dfa*flags['swc'][0])
             
         # ut, longitude magnetic activity 
         if flags['sw'][10]:
             if flags['sw'][8] == -1:
                 if p[51]:
                     t[12] = apt[0]*flags['swc'][10]*(1 + p[132]*plg[1])*\
-                    ((p[52]*plg[4] + p[98]*plg[11] + p[67]*plg[22])* np.cos(np.deg2rad(inputp['g_long'] - p[97])))\
+                    ((p[52]*plg[4] + p[98]*plg[11] + p[67]*plg[22])* np.cos(np.deg2rad(inputp['g_lon'] - p[97])))\
                     + apt[0]*flags['swc'][10]*flags['swc'][4]*(p[133]*plg[2] + p[134]*plg[7] + p[135]*plg[16])*\
-                    cd14*np.cos(np.deg2rad(inputp['g_long'] - p[136])) + apt[0]*flags['swc'][11]* \
+                    cd14*np.cos(np.deg2rad(inputp['g_lon'] - p[136])) + apt[0]*flags['swc'][11]* \
                     (p[55]*plg[1] + p[56]*plg[6] + p[57]*plg[15])*np.cos(sr*(inputp['sec'] - p[58]))
             else:
                 t[12] = apdf*flags['swc'][10]*(1 + p[120]*plg[1])*((p[60]*plg[4] + p[61]*plg[11] + p[62]*plg[22])*\
-                    np.cos(np.deg2rad(inputp['g_long']-p[63])))+apdf*flags['swc'][10]*flags['swc'][4]* \
+                    np.cos(np.deg2rad(inputp['g_lon']-p[63])))+apdf*flags['swc'][10]*flags['swc'][4]* \
                     (p[115]*plg[2] + p[116]*plg[7] + p[117]*plg[16])* \
-                    cd14*np.cos(np.deg2rad(inputp['g_long'] - p[118])) \
+                    cd14*np.cos(np.deg2rad(inputp['g_lon'] - p[118])) \
                     + apdf*flags['swc'][11]*(p[83]*plg[1] + p[84]*plg[6] + p[85]*plg[15])* np.cos(sr*(inputp['sec'] - p[75]))
 
     # parms not used: 82, 89, 99, 139-149 
@@ -596,15 +596,15 @@ def glob7s(p,inputp,flags,varli):
             t[8]=(p[50]*apt[0] + p[96]*plg[3]*apt[0]*flags['swc'][1])
 
     # longitudinal
-    if not (flags['sw'][9]==0 or flags['sw'][10]==0 or inputp['g_long']<=-1000):
+    if not (flags['sw'][9]==0 or flags['sw'][10]==0 or inputp['g_lon']<=-1000):
         t[10] = (1 + plg[1]*(p[80]*flags['swc'][4]*np.cos(dr*(inputp['doy'] - p[81]))\
             + p[85]*flags['swc'][5]*np.cos(2*dr*(inputp['doy'] - p[86])))\
             + p[83]*flags['swc'][2]*np.cos(dr*(inputp['doy'] - p[84]))\
             + p[87]*flags['swc'][3]*np.cos(2*dr*(inputp['doy'] - p[88])))\
             *((p[64]*plg[4] + p[65]*plg[11] + p[66]*plg[22]\
-            + p[74]*plg[2] + p[75]*plg[7] + p[76]*plg[16])*np.cos(np.deg2rad(inputp['g_long']))\
+            + p[74]*plg[2] + p[75]*plg[7] + p[76]*plg[16])*np.cos(np.deg2rad(inputp['g_lon']))\
             + (p[90]*plg[4] + p[91]*plg[11] + p[92]*plg[22]\
-            + p[77]*plg[2] + p[78]*plg[7] + p[79]*plg[16])*np.sin(np.deg2rad(inputp['g_long'])))
+            + p[77]*plg[2] + p[78]*plg[7] + p[79]*plg[16])*np.sin(np.deg2rad(inputp['g_lon'])))
     
     tt = 0
     for i in range(14):
@@ -1035,7 +1035,7 @@ def nrlmsise00(t,lat,lon,alt,SW_OBS_PRE,omode='Oxygen',aphmode='NoAph'):
         f107A,f107,ap,aph = get_sw(SW_OBS_PRE,t_ymd,hour)
     else:
         f107A,f107,ap,aph = 150,150,4,np.full(7,4)
-    inputp = {'doy':doy,'year':year,'sec':sec,'alt':alt,'g_lat':lat,'g_long':lon_wrap,'lst':lst,\
+    inputp = {'doy':doy,'year':year,'sec':sec,'alt':alt,'g_lat':lat,'g_lon':lon_wrap,'lst':lst,\
               'f107A':f107A,'f107':f107,'ap':ap,'ap_a':aph}
     
     switches = np.ones(23)
@@ -1048,5 +1048,9 @@ def nrlmsise00(t,lat,lon,alt,SW_OBS_PRE,omode='Oxygen',aphmode='NoAph'):
         output = gtd7(inputp,switches)
     else:
         raise Exception("'{}' should be either 'Oxygen' or 'NoOxygen'".format(o))
-    inputp['g_long'] = lon   
-    return inputp,output   
+    inputp['g_lon'] = lon   
+    inputp_format = {'Year':inputp['year'],'DayOfYear':inputp['doy'],'SecondOfDay':inputp['sec'],'Latitude[deg]':inputp['g_lat'],'Longitude[deg]':inputp['g_lon'],'Altitude[km]':inputp['alt'],'LocalSolarTime[hours]':inputp['lst'],\
+              'f107Average[10^-22 W/m^2/Hz]':inputp['f107A'],'f107Daily[10^-22 W/m^2/Hz]':inputp['f107'],'ApDaily':inputp['ap'],'Ap3Hourly':inputp['ap_a']}
+    output_format = {'Density':{'He[1/m^3]':output['d']['He'],'O[1/m^3]':output['d']['O'],'N2[1/m^3]':output['d']['N2'],'O2[1/m^3]':output['d']['O2'],'AR[1/m^3]':output['d']['AR'],'H[1/m^3]':output['d']['H'],'N[1/m^3]':output['d']['N'],'ANM O[1/m^3]':output['d']['ANM O'],'RHO[kg/m^3]':output['d']['RHO']},\
+              'Temperature':{'TINF[K]':output['t']['TINF'],'TG[K]':output['t']['TG']}} 
+    return inputp_format,output_format    

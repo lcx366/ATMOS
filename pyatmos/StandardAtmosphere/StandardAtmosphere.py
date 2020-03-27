@@ -54,7 +54,7 @@ def isa(altitude,altitude_type='geometric'):
     [temperature, pressure, density] = isa(altitude,'geopotential')
 
     Inputs:
-    altitude -> [float] altitude in [m]
+    altitude -> [float] altitude in [km]
 
     Parameters:
     altitude_type -> [optional, string, default='geometric'] type of altitude. It can either be 'geopotential' or 'geometric'.
@@ -72,6 +72,7 @@ def isa(altitude,altitude_type='geometric'):
                https://gist.github.com/buzzerrookie/5b6438c603eabf13d07e
                https://ww2.mathworks.cn/help/aerotbx/ug/atmosisa.html
     '''
+    altitude = altitude*1e3 # convert [km] to [m]
     # the lower atmosphere below 86km is separated into seven layers 
     geopotential_alt = [-610,11000, 20000, 32000, 47000, 51000,71000,84852] # Geopotential altitudes above MSL in [m]
     geometric_alt = [-611,11019, 20063, 32162, 47350, 51413, 71802,86000] # Geometric altitudes above MSL in [m]
