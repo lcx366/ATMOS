@@ -49,6 +49,7 @@ nrlmsise00
 '''
 
 import numpy as np
+from astropy.time import Time
 from scipy.interpolate import CubicSpline
 from pyshtools.legendre import PLegendreA,PlmIndex
 import pkg_resources
@@ -1021,7 +1022,8 @@ def gts7(inputp,flags,gsurf,re):
 
 # ============================ nrlmsise00 =========================== #
 
-def nrlmsise00(t,lat,lon,alt,SW_OBS_PRE,omode,aphmode):
+def nrlmsise00(t,lat,lon,alt,SW_OBS_PRE,omode='Oxygen',aphmode='NoAph'):
+    t = Time(t)
     lon_wrap = wraplon(lon)
     t_yday = t.yday.split(':')
     t_ymd = t.iso.split()[0].split('-')

@@ -100,4 +100,4 @@ def isa(altitude,altitude_type='geometric'):
             h0 = geopotential_alt[i+1]
 
     density = pressure / (R * temperature)
-    return {'temperature':temperature,'pressure':pressure,'density':density}
+    return {'temperature[K]':temperature,'pressure[Pa]':pressure,'density[kg/m^3]':density}
