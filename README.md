@@ -58,7 +58,7 @@ Get the space weather data
 Updating the space weather data ... Finished
 ```
 
-Calculate the temperatures, densities not including anomalous oxygen using the NRLMSISE-00 model at 70km, 25 degrees latitude, 102 degrees longitude on the date October 5, 2015 at 03:00:00 UTC.
+Calculate the temperatures, densities **not** including anomalous oxygen using the NRLMSISE-00 model at 70km, 25 degrees latitude, 102 degrees longitude on the date October 5, 2015 at 03:00:00 UTC.
 
 ```
 >>> from pyatmos import nrlmsise00
@@ -74,7 +74,7 @@ Calculate the temperatures, densities not including anomalous oxygen using the N
 {'Density': {'He[1/m^3]': 9100292488300570.0, 'O[1/m^3]': 0, 'N2[1/m^3]': 1.3439413974205876e+21, 'O2[1/m^3]': 3.52551376755781e+20, 'AR[1/m^3]': 1.6044163757370681e+19, 'H[1/m^3]': 0, 'N[1/m^3]': 0, 'ANM O[1/m^3]': 0, 'RHO[kg/m^3]': 8.225931818480755e-05}, 'Temperature': {'TINF[K]': 1027.3184649, 'TG[K]': 219.9649472491653}}
 ```
 
-Calculate the temperatures, densities not including anomalous oxygen using the NRLMSISE-00 model at 100km, -65 degrees latitude, -120 degrees longitude on the date July 8, 2004 at 10:30:50 UTC.
+Calculate the temperatures, densities **not** including anomalous oxygen using the NRLMSISE-00 model at 100km, -65 degrees latitude, -120 degrees longitude on the date July 8, 2004 at 10:30:50 UTC.
 
 ```
 >>> t = '2004-07-08 10:30:50' 
