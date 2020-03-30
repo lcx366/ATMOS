@@ -1022,7 +1022,7 @@ def gts7(inputp,flags,gsurf,re):
 
 # ============================ nrlmsise00 =========================== #
 
-def nrlmsise00(t,lat,lon,alt,SW_OBS_PRE,omode='Oxygen',aphmode='NoAph'):
+def nrlmsise00(t,lat,lon,alt,SW_OBS_PRE,omode='NoOxygen',aphmode='NoAph'):
     t = Time(t)
     lon_wrap = wraplon(lon)
     t_yday = t.yday.split(':')
