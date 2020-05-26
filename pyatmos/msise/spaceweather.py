@@ -16,7 +16,8 @@ get_sw      - Extract the space weather data
 
 import numpy as np
 from datetime import datetime,timedelta
-from os import getenv,path,makedirs,remove
+from os import path,makedirs,remove
+from pathlib import Path
 from urllib.request import urlretrieve
 
 # =================== download and update sw data  =================== #
@@ -48,7 +49,7 @@ def download_sw(direc=None):
     '''
     
     if direc is None:
-        home = getenv('HOME')
+        home = str(Path.home())
         direc = home + '/src/sw-data/'
     
     swfile = direc + 'SW-All.txt'
