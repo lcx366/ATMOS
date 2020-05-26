@@ -70,7 +70,7 @@ def download_sw(direc=None):
             urlretrieve(url, swfile)    
             print('Finished')
         else:
-            print('The space weather data in {:s} is already the latest.').format(direc)   
+            print('The space weather data in {:s} is already the latest.'.format(direc))   
     return swfile
 
 # =========================== read sw file ========================== #
