@@ -58,7 +58,7 @@ def download_sw(direc=None):
     if not path.exists(direc): makedirs(direc)
 
     if not path.exists(swfile):
-        print('Downloading the latest space weather data',end=' ... ')
+        print('Downloading the latest space weather data from celestrak',end=' ... ')
         urlretrieve(url, swfile)
         print('Finished')
 
@@ -66,11 +66,11 @@ def download_sw(direc=None):
         modified_time = datetime.fromtimestamp(path.getmtime(swfile))
         if datetime.now() > modified_time + timedelta(days=1):
             remove(swfile)
-            print('Updating the space weather data',end=' ... ')
+            print('Updating the space weather data from celestrak',end=' ... ')
             urlretrieve(url, swfile)    
             print('Finished')
         else:
-            print('The existing space weather data is already up to date')    
+            print('The existing space weather data is already up to date.')    
     return swfile
 
 # =========================== read sw file ========================== #
