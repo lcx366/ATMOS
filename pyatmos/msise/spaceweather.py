@@ -61,7 +61,7 @@ def download_sw(direc=None):
     bar_format = "{l_bar}%s{bar}%s{r_bar}" % (Fore.BLUE, Fore.RESET)
     if not path.exists(swfile):
         desc = 'Downloading the latest space weather data from CELESTRAK'
-        with TqdmUpTo(unit='B', unit_scale=True, desc=desc,bar_format = bar_format) as t:
+        with TqdmUpTo(unit='B', unit_scale=True, desc=desc,bar_format = bar_format,position=0) as t:
             urlretrieve(url, swfile,reporthook=t.update_to)
             t.total = t.n
 
@@ -70,7 +70,7 @@ def download_sw(direc=None):
         if datetime.now() > modified_time + timedelta(days=1):
             remove(swfile)
             desc = 'Updating the space weather data from CELESTRAK'
-            with TqdmUpTo(unit='B', unit_scale=True, desc=desc,bar_format = bar_format) as t:
+            with TqdmUpTo(unit='B', unit_scale=True, desc=desc,bar_format = bar_format,position=0) as t:
                 urlretrieve(url, swfile,reporthook=t.update_to)    
                 t.total = t.n
         else:
