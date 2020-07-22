@@ -19,6 +19,8 @@ from datetime import datetime,timedelta
 from os import path,makedirs,remove
 from pathlib import Path
 from urllib.request import urlretrieve
+from colorama import Fore
+from .tqdmupto import TqdmUpTo
 
 # =================== download and update sw data  =================== #
 
@@ -56,19 +58,21 @@ def download_sw(direc=None):
     url = 'https://www.celestrak.com/SpaceData/SW-All.txt'
 
     if not path.exists(direc): makedirs(direc)
-
+    bar_format = "{l_bar}%s{bar}%s{r_bar}" % (Fore.BLUE, Fore.RESET)
     if not path.exists(swfile):
-        print('Downloading the latest space weather data from celestrak',end=' ... ')
-        urlretrieve(url, swfile)
-        print('Finished')
+        desc = 'Downloading the latest space weather data from CELESTRAK'
+        with TqdmUpTo(unit='B', unit_scale=True, desc=desc,bar_format = bar_format) as t:
+            urlretrieve(url, swfile,reporthook=t.update_to)
+            t.total = t.n
 
     else:
         modified_time = datetime.fromtimestamp(path.getmtime(swfile))
         if datetime.now() > modified_time + timedelta(days=1):
             remove(swfile)
-            print('Updating the space weather data from celestrak',end=' ... ')
-            urlretrieve(url, swfile)    
-            print('Finished')
+            desc = 'Updating the space weather data from CELESTRAK'
+            with TqdmUpTo(unit='B', unit_scale=True, desc=desc,bar_format = bar_format) as t:
+                urlretrieve(url, swfile,reporthook=t.update_to)    
+                t.total = t.n
         else:
             print('The space weather data in {:s} is already the latest.'.format(direc))   
     return swfile

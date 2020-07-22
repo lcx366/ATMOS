@@ -1039,12 +1039,12 @@ def nrlmsise00(t,lat,lon,alt,SW_OBS_PRE,omode='NoOxygen',aphmode='NoAph'):
               'f107A':f107A,'f107':f107,'ap':ap,'ap_a':aph}
     
     switches = np.ones(23)
-    if aphmode is 'Aph':
+    if aphmode == 'Aph':
         switches[8] = -1 # -1 indicates the use of 3h geomagnetic index
         
-    if omode is 'Oxygen':
+    if omode == 'Oxygen':
         output = gtd7d(inputp,switches)
-    elif omode is 'NoOxygen':
+    elif omode == 'NoOxygen':
         output = gtd7(inputp,switches)
     else:
         raise Exception("'{}' should be either 'Oxygen' or 'NoOxygen'".format(o))

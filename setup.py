@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pyatmos',
-    version='1.1.0',
+    version='1.1.1',
     long_description_content_type='text/markdown',
     description='A package to estimate the atmosphere parameters',
     long_description=open('README.md', 'rb').read().decode('utf-8'),
@@ -14,7 +14,7 @@ setup(
     classifiers=[
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.8',
         'License :: OSI Approved :: MIT License',
         ],
     packages=setuptools.find_packages(),
@@ -26,6 +26,8 @@ setup(
         'scipy',
         'numpy',
         'pyshtools',
-        'astropy'
+        'astropy',
+        'tqdm',
+        'colorama'
         ],
 )
