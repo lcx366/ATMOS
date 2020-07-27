@@ -55,7 +55,7 @@ from pyshtools.legendre import PLegendreA,PlmIndex
 import pkg_resources
 
 from .spaceweather import get_sw
-from .utils import wraplon,hms2s,hms2h
+from ..utils.utils import wraplon,hms2s,hms2h
 
 # ======================== read data block ========================== #
 

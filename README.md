@@ -114,6 +114,8 @@ Calculate the temperatures, densities including anomalous oxygen using the NRLMS
 ```
 
 ## Change log
+- **1.1.2 — Jul 26,  2020**
+  - Added progress bar for downloading data
 - **1.1.0 — Mar 29,  2020**
   - Added the International Standard Atmosphere(ISA) Model up to 86km 
 

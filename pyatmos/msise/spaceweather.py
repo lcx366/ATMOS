@@ -1,26 +1,9 @@
-# -------------------------------------------------------------------- #
-# ------------------------  space weather  --------------------------- #
-# -------------------------------------------------------------------- #
-
-'''
-pyatmos spaceweather
-
-This submodule defines the following functions:
-
-download_sw - Download or update the space weather file from www.celestrak.com
-
-read_sw     - Read the space weather file
-
-get_sw      - Extract the space weather data    
-'''
-
 import numpy as np
 from datetime import datetime,timedelta
 from os import path,makedirs,remove
 from pathlib import Path
-from urllib.request import urlretrieve
 
-# =================== download and update sw data  =================== #
+from ..utils.try_download import tqdm_request
 
 def download_sw(direc=None):
     '''
@@ -68,8 +51,6 @@ def download_sw(direc=None):
         else:
             print('The space weather data in {:s} is already the latest.'.format(direc))   
     return swfile
-
-# =========================== read sw file ========================== #
 
 def read_sw(swfile):
     '''
@@ -122,11 +103,12 @@ def read_sw(swfile):
     SW_OBS_PRE = np.vstack((np.array(SW_OBS),np.array(SW_PRE)))   
     # inverse sort
     SW_OBS_PRE = np.flip(SW_OBS_PRE,0)
-    return SW_OBS_PRE
-
-# ========================== extract sw data ========================== #   
+    return SW_OBS_PRE 
 
 def get_sw(SW_OBS_PRE,t_ymd,hour):
+    '''
+    Extract space weather data
+    '''
     j = 0
     for ymd in SW_OBS_PRE[:,:3]:
         if np.array_equal(t_ymd,ymd): break

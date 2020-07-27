@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pyatmos',
-    version='1.1.1',
+    version='1.1.2',
     long_description_content_type='text/markdown',
     description='A package to estimate the atmosphere parameters',
     long_description=open('README.md', 'rb').read().decode('utf-8'),
