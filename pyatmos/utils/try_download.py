@@ -6,7 +6,7 @@ def tqdm_request(url,dir_to,file,desc):
     '''
     Try to download files from a remote server by request.
     '''
-    block_size = 1024
+    block_size = 1024*10
     bar_format = "{l_bar}%s{bar}%s{r_bar}" % (Fore.BLUE, Fore.RESET)
     for idownload in range(5):
         try:
@@ -19,14 +19,14 @@ def tqdm_request(url,dir_to,file,desc):
             for chunk in res.iter_content(block_size):
                 pbar.update(len(chunk))
                 local_file.write(chunk)  
+            pbar.close()  
+            res.close()  
             break
         except: 
             sleep(2)
             if idownload == 4:
                 remove(dir_to + file)
                 print('No response, skip this file.') 
-        finally:
-            pbar.close()    
-            local_file.close()  
-            res.close()  
+        finally:    
+            local_file.close() 
 
