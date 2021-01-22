@@ -49,13 +49,13 @@ nrlmsise00
 '''
 
 import numpy as np
-from astropy.time import Time
 from scipy.interpolate import CubicSpline
+from astropy.time import Time
 from pyshtools.legendre import PLegendreA,PlmIndex
 import pkg_resources
 
 from .spaceweather import get_sw
-from ..utils.utils import wraplon,hms2s,hms2h
+from ..utils.utils import wraplon,hms_conver
 
 # ======================== read data block ========================== #
 
@@ -728,7 +728,7 @@ def gtd7d(inputp, flags):
     output['d']['RHO'] = 1.66E-24 * (4 * output['d']['He'] + 16 * output['d']['O'] + 28 * output['d']['N2']\
                                      + 32 * output['d']['O2'] + 40 * output['d']['AR'] + output['d']['H'] + 14 * output['d']['N'] + 16 * output['d']['ANM O'])
 
-    output['d']['RHO'] = output['d']['RHO']/1000
+    output['d']['RHO'] = output['d']['RHO']/1e3
     return output
 
 # =============================== gts7 ------------------------------ #
@@ -1022,14 +1022,58 @@ def gts7(inputp,flags,gsurf,re):
 
 # ============================ nrlmsise00 =========================== #
 
-def nrlmsise00(t,lat,lon,alt,SW_OBS_PRE,omode='NoOxygen',aphmode='NoAph'):
+def nrlmsise00(t,location,SW_OBS_PRE,anmomode=True,aphmode=True):
+    """
+    NRLMSISE-00 is an empirical, global reference atmospheric model of the Earth from ground to space up to 1000km.
+    It models the density and temperature at a specific location(geodetic coordinates) and time.
+    A primary use of this model is to aid predictions of satellite orbital decay due to atmospheric drag. 
+
+    Units: 
+        number density of atmosphere's components: [1/m^3]
+        density: [kg/m^3]
+        temperature: [K]
+
+    Example:
+    >>> t = '2019-08-20 23:10:59' 
+    >>> lat,lon,alt = 3,5,900 
+    >>> params,rho,T,nd = nrlmsise00(t,(lat,lon,alt),swdata)
+    >>> print(params)
+    >>> print(rho) 
+    >>> print(T) 
+    >>> print(nd)   
+
+    Usage:
+    params,rho,T,nd = nrlmsise00(t,(lat,lon,alt),swdata,omode='Oxygen',aphmode = 'Aph')    
+
+    Inputs:
+    t -> [str] time(UTC)
+    location -> [tuple/list] geodetic latitude, longitude in [degree], and altitude in [km]
+
+    Parameters:
+    anmomode -> [bool] whether to add anomalous oxygen component to the density; defalut = True
+    aphmode -> [bool] whether to use the 3h geomagnetic index, default = False
+
+    Output:
+    params -> [dict] parameters involved in computations, including Year, DayOfYear(DOY), SecondOfDay(SOD), 
+              Latitude[deg], Longitude[deg], Altitude[km], LocalSolarTime(LST), f107Average(f107A) [10^-22 W/m^2/Hz]
+              f107Daily(f107D) [10^-22 W/m^2/Hz], ApDaily(ApD), Ap3Hourly(Ap3H)
+    rho -> [float] total mass density, [kg/m^3]
+    T -> [tuple] exospheric and local temperature, [K]
+    nd -> [dict] number density of components, [1/m^3]; mainly include Helium(He), Oxygen(O), Oxygen(O2), Nitrogen(N),
+          Nitrogen(N2), Argon(Ar), Hydrogen(H), Anomalous Oxygen(ANM O)
+    """
+
+    lat,lon,h = location
+
+    # calculate the altitude above sea level from height
+    alt = h
+        
     t = Time(t)
     lon_wrap = wraplon(lon)
     t_yday = t.yday.split(':')
     t_ymd = t.iso.split()[0].split('-')
     year,doy = int(t_yday[0]),int(t_yday[1])
-    sec = hms2s(int(t_yday[2]),int(t_yday[3]),float(t_yday[4]))
-    hour = hms2h(int(t_yday[2]),int(t_yday[3]),float(t_yday[4]))
+    hour,sec = hms_conver(int(t_yday[2]),int(t_yday[3]),float(t_yday[4]))
     lst = hour + wraplon(lon)/15
     if alt > 80:
         f107A,f107,ap,aph = get_sw(SW_OBS_PRE,t_ymd,hour)
@@ -1039,18 +1083,17 @@ def nrlmsise00(t,lat,lon,alt,SW_OBS_PRE,omode='NoOxygen',aphmode='NoAph'):
               'f107A':f107A,'f107':f107,'ap':ap,'ap_a':aph}
     
     switches = np.ones(23)
-    if aphmode == 'Aph':
-        switches[8] = -1 # -1 indicates the use of 3h geomagnetic index
+    if aphmode: switches[8] = -1 # -1 indicates the use of 3h geomagnetic index
         
-    if omode == 'Oxygen':
+    if anmomode:
         output = gtd7d(inputp,switches)
-    elif omode == 'NoOxygen':
-        output = gtd7(inputp,switches)
     else:
-        raise Exception("'{}' should be either 'Oxygen' or 'NoOxygen'".format(o))
+        output = gtd7(inputp,switches)
+
     inputp['g_lon'] = lon   
-    inputp_format = {'Year':inputp['year'],'DayOfYear':inputp['doy'],'SecondOfDay':inputp['sec'],'Latitude[deg]':inputp['g_lat'],'Longitude[deg]':inputp['g_lon'],'Altitude[km]':inputp['alt'],'LocalSolarTime[hours]':inputp['lst'],\
-              'f107Average[10^-22 W/m^2/Hz]':inputp['f107A'],'f107Daily[10^-22 W/m^2/Hz]':inputp['f107'],'ApDaily':inputp['ap'],'Ap3Hourly':inputp['ap_a']}
-    output_format = {'Density':{'He[1/m^3]':output['d']['He'],'O[1/m^3]':output['d']['O'],'N2[1/m^3]':output['d']['N2'],'O2[1/m^3]':output['d']['O2'],'AR[1/m^3]':output['d']['AR'],'H[1/m^3]':output['d']['H'],'N[1/m^3]':output['d']['N'],'ANM O[1/m^3]':output['d']['ANM O'],'RHO[kg/m^3]':output['d']['RHO']},\
-              'Temperature':{'TINF[K]':output['t']['TINF'],'TG[K]':output['t']['TG']}} 
-    return inputp_format,output_format    
+    params = {'Year':inputp['year'],'DOY':inputp['doy'],'SOD':inputp['sec'],'Lat':inputp['g_lat'],'Lon':inputp['g_lon'],'Alt':inputp['alt'],'LST':inputp['lst'],\
+              'f107A':inputp['f107A'],'f107D':inputp['f107'],'ApD':inputp['ap'],'Ap3H':inputp['ap_a']}
+    rho = output['d']['RHO']          
+    T = (output['t']['TINF'],output['t']['TG'])
+    nd = {'He':output['d']['He'],'O':output['d']['O'],'N2':output['d']['N2'],'O2':output['d']['O2'],'Ar':output['d']['AR'],'H':output['d']['H'],'N':output['d']['N'],'ANM O':output['d']['ANM O']}
+    return params,rho,T,nd  
