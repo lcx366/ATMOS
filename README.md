@@ -1,129 +1,100 @@
 # Welcome to ATMOS
 
-The pyatmos package is an archive of scientific routines that aims to implement the estimation of atmospheric properties for various atmosphere models. Currently, feasible atmosphere models include:
-
-1. International Standard Atmosphere(ISA) Model up to 86km
-2. NRLMSISE-00
+This package is an archive of scientific routines that implements the estimation of atmospheric properties for various atmosphere models, such as Exponential, COESA76, and NRLMSISE-00. The package mainly estimates density, temperature, pressure and other parameters of air at a set of specific altitudes. For atmosphere below 86 kilometers, it also calculates the speed of sound, viscosity, and thermal conductivity.
 
 ## How to install
 
-pyatmos can be installed with
+On Linux, macOS and Windows architectures, the binary wheels can be installed using pip by executing one of the following commands:
 
 ```sh
 pip install pyatmos
+pip install pyatmos --upgrade # to upgrade a pre-existing installation
 ```
 
 ## How to use
 
-### International Standard Atmosphere
-
-Calculate the ISA at an altitude(default is geometric) of 10km.
+#### Exponential
 
 ```python
->>> from pyatmos import isa
->>> isa(10)
-{'temperature[K]': 223.25186489868483,
- 'pressure[Pa]': 26499.756053713343,
- 'density[kg/m^3]': 0.41350863360218376}
+>>> from ATMOS.pyatmos import expo
+>>> rhos_geom = expo([0,20,40,60,80]) # geometric altitudes by default
+>>> print(rhos_geom) # [kg/m^3]
+>>> rhos_geop = expo([0,20,40,60,80],'geopotential') # geopotential altitudes
+>>> print(rhos_geop)
+
+[1.22500000e+00 7.76098911e-02 3.97200000e-03 3.20600000e-04
+ 1.90500000e-05]
+[1.22500000e+00 7.69385063e-02 3.84131212e-03 2.97747719e-04
+ 1.59847603e-05]
 ```
 
-Calculate the ISA at a geopotential altitude of 50km.
+#### COESA 1976
 
 ```python
->>> isa(50,'geopotential')
-{'temperature[K]': 270.65,
- 'pressure[Pa]': 75.94476758456234,
- 'density[kg/m^3]': 0.0009775244455727493}
+>>> from ATMOS.pyatmos import coesa76
+>>> rhos_geom,Ts_geom,Ps_geom = coesa76([0,20,40,60,80]) 
+>>> print(rhos_geom) # [kg/m^3]
+>>> rhos_geop,Ts_geop,Ps_geop = coesa76([0,20,40,60,80],'geopotential')
+>>> print(rhos_geop) # [kg/m^3]
+>>> rhos_geom,Ts_geom,Ps_geom = coesa76([100,300,500,700,900]) 
+>>> print(rhos_geom) # [kg/m^3]
+
+[1.22499916e+00 8.89079563e-02 3.99535051e-03 3.09628985e-04
+ 1.84514759e-05]
+[1.22499916e+00 8.80348036e-02 3.85100688e-03 2.88320680e-04
+ 1.57005388e-05]
+[5.60184300e-07 1.91512264e-11 5.21285933e-13 3.06944380e-14
+ 5.75807856e-15]  
 ```
 
-Calculate the ISA at 90km.
+#### NRLMSISE-00
+
+*Before using NRLMSISE-00, the space weather data needs to be prepared in advance.*
 
 ```python
->>> isa(90)
-Exception: geometric altitude should be in [-0.611, 86.0] km
->>> isa(90,'geopotential')    
-Exception: geopotential altitude should be in [-0.610, 84.852] km    
-```
-
-### NRLMSISE-00
-
-Get the space weather data
-
-```python
->>> from pyatmos import download_sw,read_sw
+>>> from ATMOS.pyatmos import download_sw,read_sw
 >>> # Download or update the space weather file from www.celestrak.com
 >>> swfile = download_sw() 
 >>> # Read the space weather data
 >>> swdata = read_sw(swfile) 
-Updating the space weather data ... Finished
 ```
 
-Calculate the temperatures, densities **not** including anomalous oxygen using the NRLMSISE-00 model at 70km, 25 degrees latitude, 102 degrees longitude on the date October 5, 2015 at 03:00:00 UTC.
+Calculate the temperature, density at [25N, 102E, 20km] at 03:00:00 UTC on October 5, 2015 with anomalous oxygen and 3h-geomagnetic index.
 
 ```
->>> from pyatmos import nrlmsise00
+>>> from ATMOS.pyatmos import nrlmsise00
 >>> # Set a specific time and location
->>> t = '2015-10-05 03:00:00' # time(UTC)
->>> lat,lon = 25,102 # latitude and longitude [degree]
->>> alt = 70 # altitude [km]
->>> para_input,para_output = nrlmsise00(t,lat,lon,alt,swdata)
->>> print(para_input,'\n')
->>> print(para_output)
-{'Year': 2015, 'DayOfYear': 278, 'SecondOfDay': 10800.0, 'Latitude[deg]': 25, 'Longitude[deg]': 102, 'Altitude[km]': 70, 'LocalSolarTime[hours]': 9.8, 'f107Average[10^-22 W/m^2/Hz]': 150, 'f107Daily[10^-22 W/m^2/Hz]': 150, 'ApDaily': 4, 'Ap3Hourly': array([4, 4, 4, 4, 4, 4, 4])} 
+>>> t = '2015-10-05 03:00:00' # time(UTC) 
+>>> lat,lon,alt = 25,102,600 # latitude, longitude in [degree], and altitude in [km]
+>>> params,rho,T,nd = nrlmsise00(t,(lat,lon,alt),swdata) # aphmode=True
+>>> print(params)
+>>> print(rho) 
+>>> print(T) 
+>>> print(nd)
 
-{'Density': {'He[1/m^3]': 9100292488300570.0, 'O[1/m^3]': 0, 'N2[1/m^3]': 1.3439413974205876e+21, 'O2[1/m^3]': 3.52551376755781e+20, 'AR[1/m^3]': 1.6044163757370681e+19, 'H[1/m^3]': 0, 'N[1/m^3]': 0, 'ANM O[1/m^3]': 0, 'RHO[kg/m^3]': 8.225931818480755e-05}, 'Temperature': {'TINF[K]': 1027.3184649, 'TG[K]': 219.9649472491653}}
+{'Year': 2015, 'DOY': 278, 'SOD': 10800.0, 'Lat': 25, 'Lon': 102, 'Alt': 600, 'LST': 9.8, 'f107A': 104.4, 'f107D': 82.6, 'ApD': 18, 'Ap3H': array([18.   , 22.   , 22.   , 22.   ,  7.   , 15.25 ,  9.375])}
+6.416602651204796e-14
+(853.466244160143, 853.4647165799171)
+{'He': 2388916051039.6826, 'O': 1758109067905.8027, 'N2': 2866987110.5606275, 'O2': 22411077.605527952, 'Ar': 4351.013995142538, 'H': 155026672753.3203, 'N': 46719306249.863495, 'ANM O': 4920851253.780525}
 ```
 
-Calculate the temperatures, densities **not** including anomalous oxygen using the NRLMSISE-00 model at 100km, -65 degrees latitude, -120 degrees longitude on the date July 8, 2004 at 10:30:50 UTC.
-
-```
->>> t = '2004-07-08 10:30:50' 
->>> lat,lon,alt = -65,-120,100 
->>> para_input,para_output = nrlmsise00(t,lat,lon,alt,swdata)
->>> print(para_input,'\n')
->>> print(para_output)
-{'Year': 2004, 'DayOfYear': 190, 'SecondOfDay': 37850.0, 'Latitude[deg]': -65, 'Longitude[deg]': -120, 'Altitude[km]': 100, 'LocalSolarTime[hours]': 2.5138888888888893, 'f107Average[10^-22 W/m^2/Hz]': 109.0, 'f107Daily[10^-22 W/m^2/Hz]': 79.3, 'ApDaily': 2, 'Ap3Hourly': array([2.   , 2.   , 2.   , 2.   , 2.   , 3.125, 4.625])} 
-
-{'Density': {'He[1/m^3]': 119477307274636.89, 'O[1/m^3]': 4.1658304136233e+17, 'N2[1/m^3]': 7.521248904485598e+18, 'O2[1/m^3]': 1.7444969074975662e+18, 'AR[1/m^3]': 7.739495767665198e+16, 'H[1/m^3]': 22215754381448.5, 'N[1/m^3]': 152814261016.3964, 'ANM O[1/m^3]': 1.8278224834873257e-37, 'RHO[kg/m^3]': 4.584596293339505e-07}, 'Temperature': {'TINF[K]': 1027.3184649, 'TG[K]': 192.5868649143824}}
-```
-
-Calculate the temperatures, densities including anomalous oxygen using the NRLMSISE-00 model at 500km, 85 degrees latitude, 210 degrees longitude on the date February 15, 2010 at 12:18:37 UTC.
-
-```
->>> t = '2010-02-15 12:18:37' 
->>> lat,lon,alt = 85,210,500 
->>> para_input,para_output = nrlmsise00(t,lat,lon,alt,swdata,omode='Oxygen')
->>> print(para_input,'\n')
->>> print(para_output)
-{'Year': 2010, 'DayOfYear': 46, 'SecondOfDay': 44317.0, 'Latitude[deg]': 85, 'Longitude[deg]': 210, 'Altitude[km]': 500, 'LocalSolarTime[hours]': 2.310277777777779, 'f107Average[10^-22 W/m^2/Hz]': 83.4, 'f107Daily[10^-22 W/m^2/Hz]': 89.4, 'ApDaily': 14, 'Ap3Hourly': array([14.   ,  5.   ,  7.   ,  6.   , 15.   ,  5.375,  4.   ])} 
-
-{'Density': {'He[1/m^3]': 2830075020953.2334, 'O[1/m^3]': 5866534735436.941, 'N2[1/m^3]': 59516979995.87239, 'O2[1/m^3]': 1558775273.2950978, 'AR[1/m^3]': 825564.7467165776, 'H[1/m^3]': 142697077779.00586, 'N[1/m^3]': 53473812381.891624, 'ANM O[1/m^3]': 4258921381.0652237, 'RHO[kg/m^3]': 1.790487924033088e-13}, 'Temperature': {'TINF[K]': 850.5598890315023, 'TG[K]': 850.5507885501303}}
-```
-
-Calculate the temperatures, densities including anomalous oxygen using the NRLMSISE-00 model at 900km, 3 degrees latitude, 5 degrees longitude on the date August 20, 2019 at 23:10:59 UTC. It uses not only Daily AP but also 3-hour AP magnetic index.
-
-```
->>> t = '2019-08-20 23:10:59' 
->>> lat,lon,alt = 3,5,900 
->>> para_input,para_output = nrlmsise00(t,lat,lon,alt,swdata,omode='Oxygen',aphmode = 'Aph')
->>> print(para_input,'\n')
->>> print(para_output)
-{'Year': 2019, 'DayOfYear': 232, 'SecondOfDay': 83459.0, 'Latitude[deg]': 3, 'Longitude[deg]': 5, 'Altitude[km]': 900, 'LocalSolarTime[hours]': 23.51638888888889, 'f107Average[10^-22 W/m^2/Hz]': 67.4, 'f107Daily[10^-22 W/m^2/Hz]': 67.7, 'ApDaily': 4, 'Ap3Hourly': array([4.   , 4.   , 3.   , 3.   , 5.   , 3.625, 3.5  ])} 
-
-{'Density': {'He[1/m^3]': 74934329990.0412, 'O[1/m^3]': 71368139.39199762, 'N2[1/m^3]': 104.72048033793158, 'O2[1/m^3]': 0.09392848471935447, 'AR[1/m^3]': 1.3231114543012155e-07, 'H[1/m^3]': 207405192640.34592, 'N[1/m^3]': 3785341.821909535, 'ANM O[1/m^3]': 1794317839.638502, 'RHO[kg/m^3]': 8.914971667362366e-16}, 'Temperature': {'TINF[K]': 646.8157488121493, 'TG[K]': 646.8157488108872}}
-```
+**Note: The range of longitude is [0,360] by default, and the west longitude can also be expressed as a negative number.**
 
 ## Change log
-- **1.1.2 — Jul 26,  2020**
-  - Added progress bar for downloading data
+- **1.2.0 — Jan 22, 2021**
+  - Added **Exponential Atmosphere** up to 1000km
+  - Added **Committee on Extension to the Standard Atmosphere(COESA)** up to 1000km
+  - Completed part of the help documentation for NRLMSISE-00
+  - Improved the code structure to make it easier to read
+- **1.1.2 — Jul 26, 2020**
+  - Added colored-progress bar for downloading data
 - **1.1.0 — Mar 29,  2020**
-  - Added the International Standard Atmosphere(ISA) Model up to 86km 
+  - Added the International Standard Atmosphere(ISA) Model up to 86kms  
 
 ## Next release
 
-- Complete the help documentation
-- Improve the code structure to make it easier to read
-- Add other atmospheric models, such as the **U.S. Standard Atmosphere 1976(USSA1976)** or **Committee on Extension to the Standard Atmosphere(COESA)** up to 1000km, **Unofficial Australian Standard Atmosphere 2000(UASA2000)**, and the **Jacchia-Bowman 2008 Empirical Thermospheric Density Model(JB2008)**
+- Complete the help documentation for NRLMSISE-00
+- Add other atmospheric models, such as the **Earth Global Reference Atmospheric Model(Earth-GRAM) 2016**, and the **Jacchia-Bowman 2008 Empirical Thermospheric Density Model(JB2008)**
 
 ## Reference
 
@@ -132,10 +103,12 @@ Calculate the temperatures, densities including anomalous oxygen using the NRLMS
 - https://gist.github.com/buzzerrookie/5b6438c603eabf13d07e
 - https://ww2.mathworks.cn/help/aerotbx/ug/atmosisa.html
 
-* [Original Fortran and C code](https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/msis/)
-* [MSISE-00 in Python and Matlab](https://github.com/space-physics/msise00)
-* [NRLMSISE-00 Atmosphere Model - Matlab](https://ww2.mathworks.cn/matlabcentral/fileexchange/56253-nrlmsise-00-atmosphere-model?requestedDomain=zh)
-* [NRLMSISE-00 Atmosphere Model - Aerospace Blockset](https://www.mathworks.com/help/aeroblks/nrlmsise00atmospheremodel.html?requestedDomain=)
-* [NRLMSISE-00 Atmosphere Model - CCMC](https://ccmc.gsfc.nasa.gov/modelweb/models/nrlmsise00.php)
-* [NRLMSISE-00 empirical model of the atmosphere: Statistical comparisons and scientific issues](http://onlinelibrary.wiley.com/doi/10.1029/2002JA009430/pdf)
+- [Original Fortran and C code](https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/msis/)
+- [MSISE-00 in Python and Matlab](https://github.com/space-physics/msise00)
+- [NRLMSISE-00 Atmosphere Model - Matlab](https://ww2.mathworks.cn/matlabcentral/fileexchange/56253-nrlmsise-00-atmosphere-model?requestedDomain=zh)
+- [NRLMSISE-00 Atmosphere Model - Aerospace Blockset](https://www.mathworks.com/help/aeroblks/nrlmsise00atmospheremodel.html?requestedDomain=)
+- [NRLMSISE-00 Atmosphere Model - CCMC](https://ccmc.gsfc.nasa.gov/modelweb/models/nrlmsise00.php)
+- [NRLMSISE-00 empirical model of the atmosphere: Statistical comparisons and scientific issues](http://onlinelibrary.wiley.com/doi/10.1029/2002JA009430/pdf)
+- [ATMOSPHERIC MODELS](http://www.braeunig.us/space/atmmodel.htm)
+- [poliastro-Atmosphere module](https://docs.poliastro.space/en/stable/api/safe/atmosphere/atmosphere_index.html?highlight=nrlmsise#famous-atmospheric-models)
 
