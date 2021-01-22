@@ -14,7 +14,7 @@ setup(
     python_requires = '>=3.6',
     classifiers = [
         'Development Status :: 4 - Beta',
-        'Intended Audience :: Education/Engineering',
+        'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
