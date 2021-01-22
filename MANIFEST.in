@@ -1,3 +1,5 @@
 include README.md
 include LICENSE.txt
-include pyatmos/data/nrlmsis00_data.npz
+include test.ipynb
+include pyatmos/data/*
+
