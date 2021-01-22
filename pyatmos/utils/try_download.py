@@ -4,7 +4,7 @@ from colorama import Fore
 
 def tqdm_request(url,dir_to,file,desc):
     '''
-    Try to download files from a remote server by request.
+    Try to download files from a remote server by request with a colored progress bar.
     '''
     block_size = 1024*10
     bar_format = "{l_bar}%s{bar}%s{r_bar}" % (Fore.BLUE, Fore.RESET)
