@@ -1,33 +1,37 @@
-import setuptools
-from setuptools import setup 
+from setuptools import setup,find_packages 
 
 setup(
-    name='pyatmos',
-    version='1.1.2',
-    long_description_content_type='text/markdown',
-    description='A package to estimate the atmosphere parameters',
-    long_description=open('README.md', 'rb').read().decode('utf-8'),
-    license='MIT',
-    author='Chunxiao Li',
-    author_email='lcx366@126.com',
-    url='https://github.com/lcx366/ATMOS',
-    classifiers=[
-        'Intended Audience :: Education',
+    name = 'pyatmos',
+    version = '1.2.0',
+    description = 'A package to estimate the atmosphere parameters',
+    author = 'Chunxiao Li',
+    author_email = 'lcx366@126.com',
+    url = 'https://github.com/lcx366/ATMOS',
+    license = 'MIT',
+    long_description_content_type = 'text/markdown',
+    long_description = open('README.md', 'rb').read().decode('utf-8'),
+    keywords = ['atmosphere models','coesa76','msise00'],
+    python_requires = '>=3.6',
+    classifiers = [
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Education/Engineering',
         'Intended Audience :: Science/Research',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'License :: OSI Approved :: MIT License',
         ],
-    packages=setuptools.find_packages(),
-    include_package_data=True,
-    package_data = {
-        'pyatmos.data': ['*.npz'],
-        },
+    packages = find_packages(),
+    include_package_data = True,
+    package_data = {'pyatmos.data': ['*.npz'],},
     install_requires=[
         'scipy',
         'numpy',
-        'pyshtools',
         'astropy',
-        'tqdm',
-        'colorama'
         ],
-)
+    extras_require={
+        'colored-progress': ['tqdm','colorama'],
+        'legendre': ['pyshtools'],
+        'time-coordinates': ['astropy'],
+        },    
+    )
