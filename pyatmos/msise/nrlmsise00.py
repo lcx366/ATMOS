@@ -1051,7 +1051,7 @@ def nrlmsise00(t,location,SW_OBS_PRE,anmomode=True,aphmode=True):
 
     Parameters:
     anmomode -> [bool] whether to add anomalous oxygen component to the density; defalut = True
-    aphmode -> [bool] whether to use the 3h geomagnetic index, default = False
+    aphmode -> [bool] whether to use the 3h geomagnetic index, default = True
 
     Output:
     params -> [dict] parameters involved in computations, including Year, DayOfYear(DOY), SecondOfDay(SOD), 
