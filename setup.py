@@ -10,7 +10,7 @@ setup(
     license = 'MIT',
     long_description_content_type = 'text/markdown',
     long_description = open('README.md', 'rb').read().decode('utf-8'),
-    keywords = ['atmosphere models','coesa76','msise00'],
+    keywords = ['atmosphere models','coesa76','nrlmsise00'],
     python_requires = '>=3.6',
     classifiers = [
         'Development Status :: 4 - Beta',
