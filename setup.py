@@ -2,7 +2,7 @@ from setuptools import setup,find_packages
 
 setup(
     name = 'pyatmos',
-    version = '1.2.0',
+    version = '1.2.1',
     description = 'A package to estimate the atmosphere parameters',
     author = 'Chunxiao Li',
     author_email = 'lcx366@126.com',
