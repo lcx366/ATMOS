@@ -1,6 +1,8 @@
 # Welcome to ATMOS
 
-This package is an archive of scientific routines that implements the estimation of atmospheric properties for various atmosphere models, such as Exponential, COESA76, and NRLMSISE-00. The package mainly estimates density, temperature, pressure and other parameters of air at a set of specific altitudes. For atmosphere below 86 kilometers, it also calculates the speed of sound, viscosity, and thermal conductivity.
+[![PyPI version shields.io](https://img.shields.io/pypi/v/pyatmos.svg)](https://pypi.python.org/pypi/pyatmos/) [![PyPI pyversions](https://img.shields.io/pypi/pyversions/pyatmos.svg)](https://pypi.python.org/pypi/pyatmos/) [![PyPI status](https://img.shields.io/pypi/status/pyatmos.svg)](https://pypi.python.org/pypi/pyatmos/) [![GitHub contributors](https://img.shields.io/github/contributors/lcx366/ATMOS.svg)](https://GitHub.com/lcx366/ATMOS/graphs/contributors/) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/lcx366/ATMOS/graphs/commit-activity) [![GitHub license](https://img.shields.io/github/license/lcx366/ATMOS.svg)](https://github.com/lcx366/ATMOS/blob/master/LICENSE) [![Documentation Status](https://readthedocs.org/projects/pystmos/badge/?version=latest)](http://pyatmos.readthedocs.io/?badge=latest) [![Build Status](https://travis-ci.org/lcx366/ATMOS.svg?branch=master)](https://travis-ci.org/lcx366/ATMOS)
+
+This package is an archive of scientific routines that implements the estimation of atmospheric properties for various atmosphere models, such as Exponential, COESA76, and NRLMSISE-00. The package mainly estimates density, temperature, and pressure of air at a set of specific altitudes.
 
 ## How to install
 
@@ -16,7 +18,7 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 #### Exponential
 
 ```python
->>> from ATMOS.pyatmos import expo
+>>> from pyatmos import expo
 >>> rhos_geom = expo([0,20,40,60,80]) # geometric altitudes by default
 >>> print(rhos_geom) # [kg/m^3]
 >>> rhos_geop = expo([0,20,40,60,80],'geopotential') # geopotential altitudes
@@ -31,7 +33,7 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 #### COESA 1976
 
 ```python
->>> from ATMOS.pyatmos import coesa76
+>>> from pyatmos import coesa76
 >>> rhos_geom,Ts_geom,Ps_geom = coesa76([0,20,40,60,80]) 
 >>> print(rhos_geom) # [kg/m^3]
 >>> rhos_geop,Ts_geop,Ps_geop = coesa76([0,20,40,60,80],'geopotential')
@@ -52,7 +54,7 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 *Before using NRLMSISE-00, the space weather data needs to be prepared in advance.*
 
 ```python
->>> from ATMOS.pyatmos import download_sw,read_sw
+>>> from pyatmos import download_sw,read_sw
 >>> # Download or update the space weather file from www.celestrak.com
 >>> swfile = download_sw() 
 >>> # Read the space weather data
@@ -62,7 +64,7 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 Calculate the temperature, density at [25N, 102E, 20km] at 03:00:00 UTC on October 5, 2015 with anomalous oxygen and 3h-geomagnetic index.
 
 ```
->>> from ATMOS.pyatmos import nrlmsise00
+>>> from pyatmos import nrlmsise00
 >>> # Set a specific time and location
 >>> t = '2015-10-05 03:00:00' # time(UTC) 
 >>> lat,lon,alt = 25,102,600 # latitude, longitude in [degree], and altitude in [km]
@@ -81,9 +83,9 @@ Calculate the temperature, density at [25N, 102E, 20km] at 03:00:00 UTC on Octob
 **Note: The range of longitude is [0,360] by default, and the west longitude can also be expressed as a negative number.**
 
 ## Change log
-- **1.2.0 — Jan 22, 2021**
-  - Added **Exponential Atmosphere** up to 1000km
-  - Added **Committee on Extension to the Standard Atmosphere(COESA)** up to 1000km
+- **1.2.1 — Jan 22, 2021**
+  - Added **Exponential Atmosphere** up to 1000 km
+  - Added **Committee on Extension to the Standard Atmosphere(COESA)** up to 1000 km
   - Completed part of the help documentation for NRLMSISE-00
   - Improved the code structure to make it easier to read
 - **1.1.2 — Jul 26, 2020**
