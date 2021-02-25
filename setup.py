@@ -32,6 +32,5 @@ setup(
     extras_require={
         'colored-progress': ['tqdm','colorama'],
         'legendre': ['pyshtools'],
-        'time-coordinates': ['astropy'],
         },    
     )
