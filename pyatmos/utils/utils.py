@@ -1,6 +1,5 @@
 import numpy as np
 import warnings
-
 from . import Const
 
 def vectorize(x):
@@ -13,7 +12,7 @@ def vectorize(x):
     except:
         x = np.array([x])
     return x    
-            
+          
 def wraplon(lon):
     '''
     Wrap a longitude in range of [0,360] to [-180,180].
@@ -64,6 +63,16 @@ def hms_conver(h,m,s):
     seconds = h*3.6e3 + m*60 + s
     return hours,seconds
 
+def ydhms_days(ydhms):
+    '''
+    Convert the form of hour/minute/second to hours and seconds.
+
+    Uasge:
+    hours,seconds = hms_conversion(h,m,s)
+    '''
+    days = ydhms[1] + ydhms[2]/24 + ydhms[3]/1440 + ydhms[4]/86400 - 1
+    return days
+
 def alt_conver(alts,alt_type='geometric'):
     '''
     Fulfill conversions between geometric altitudes and geopotential altitudes.  
@@ -86,17 +95,17 @@ def alt_conver(alts,alt_type='geometric'):
 
     alts = vectorize(alts)
 
-    r0 = Const.r0
+    R0 = Const.R0
 
     if alt_type == 'geometric': 
         zs = alts
         # from geometric altitude to geopotential altitude
-        hs = zs*r0/(r0+zs)  
+        hs = zs*R0/(R0+zs)  
 
     elif alt_type == 'geopotential':
         hs = alts
         # from geopotential altitude to geometric altitude
-        zs = hs*r0/(r0-hs)  
+        zs = hs*R0/(R0-hs)  
     return zs,hs
 
 def check_altitude(zs,z_range,mode):
