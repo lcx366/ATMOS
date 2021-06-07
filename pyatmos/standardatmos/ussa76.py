@@ -6,9 +6,8 @@ activity.
 """
 
 import numpy as np
-
 from ..utils import Const
-    
+ 
 def lapse_tp(t_lower, p_lower, lr, h_lower, h_upper):
     '''
     Calculate the temperature and pressure at a given geopotential altitude above base of a specific layer.
@@ -65,7 +64,7 @@ def ussa76(h):
     eta -> [float] dynamic viscosity ..., [kg/m/s]
     Kc -> [float] thermal conductivity ..., [J/(m*s*K)]
     
-    Note: the geopotential altitude should be in [-0.610,84.852] km, otherwise the output will be extrapolated for those input altitudes.
+    Note: the geometric altitude should be in [-0.611,86] km, otherwise the output will be extrapolated for those input altitudes.
 
     Reference: 
         U.S. Standard Atmosphere, 1976, U.S. Government Printing Office, Washington, D.C. 
@@ -74,7 +73,7 @@ def ussa76(h):
         https://ww2.mathworks.cn/help/aerotbx/ug/atmosisa.
         http://www.braeunig.us/space/atmmodel.htm#USSA1976
     '''
-    t0,p0,h0 = Const.t0,Const.p0,Const.h0
+    T0,p0,h0 = Const.T0,Const.p0,Const.h0
     R_air,M0,gamma = Const.R_air,Const.M0,Const.gamma
 
     # the lower atmosphere below 86km is separated into seven layers 
@@ -84,11 +83,11 @@ def ussa76(h):
 
     for i in range(len(lr)):
         if h <= geopotential_alt[i+1]:
-            T, P = lapse_tp(t0, p0, lr[i], h0, h)
+            T, P = lapse_tp(T0, p0, lr[i], h0, h)
             break
         else:
             # if altitudes are greater than the first several layers, then it has to integeate these layers first.
-            t0, p0 = lapse_tp(t0, p0, lr[i], h0, geopotential_alt[i+1])
+            T0, p0 = lapse_tp(T0, p0, lr[i], h0, geopotential_alt[i+1])
             h0 = geopotential_alt[i+1]
 
     # density
