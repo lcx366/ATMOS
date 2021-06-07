@@ -82,7 +82,7 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 >>> swdata = read_sw_nrlmsise00(swfile) 
 ```
 
-```
+```python
 >>> from pyatmos import nrlmsise00
 >>> # Set a specific time and location
 >>> t = '2014-07-22 22:18:45' # time(UTC) 
