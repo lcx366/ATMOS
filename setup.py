@@ -26,6 +26,7 @@ setup(
     install_requires=[
         'scipy',
         'numpy',
+        'numba',
         'astropy',
         'pyshtools',
         'tqdm',
