@@ -41,7 +41,7 @@ def download_sw_nrlmsise00(direc=None):
             desc = 'Updating the space weather data {:s} from CELESTRAK'.format('SW-All.txt')
             tqdm_request(url,direc,'SW-All.txt',desc)   
         else:
-            print('The space weather data in {:s} is already the latest.'.format(direc))   
+            print('The space weather data {0:s} in {1:s} is already the latest.'.format('SW-All.txt',direc))   
     return swfile
  
 def read_sw_nrlmsise00(swfile):
