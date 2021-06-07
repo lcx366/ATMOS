@@ -14,4 +14,3 @@ read_sw - Read the space weather file
 get_sw - Extract the space weather data  
 
 '''              
-from .spaceweather import download_sw,read_sw
