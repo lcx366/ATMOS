@@ -3,14 +3,14 @@ pyatmos msise subpackage
 
 This subpackage defines the following functions:
 
-# nrlmsise00.py  - Implements the NRLMSISE 00 model
+nrlmsise00_subfunc.py  - subfunctions that implement the atmospheric model NRLMSISE-00
 
-# spaceweather.py 
+nrlmsise00.py  - Input interface of NRLMSISE-00
 
-download_sw - Download or update the space weather file from www.celestrak.com
+spaceweather.py
 
-read_sw - Read the space weather file
+    download_sw_nrlmsise00 - Download or update the space weather file for NRLMSISE-00 from www.celestrak.com
 
-get_sw - Extract the space weather data  
+    read_sw_nrlmsise00 - Read the space weather file for NRLMSISE-00
 
 '''              
