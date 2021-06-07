@@ -1,6 +1,8 @@
 import requests
 from tqdm import tqdm
 from colorama import Fore
+from time import sleep
+from os import remove
 
 def tqdm_request(url,dir_to,file,desc):
     '''
@@ -12,10 +14,9 @@ def tqdm_request(url,dir_to,file,desc):
         try:
             local_file = open(dir_to + file, 'ab')
             pos = local_file.tell()
-            resume_header = {'Range': f'bytes={pos}-'}
-            res = requests.get(url,stream=True,timeout=100,headers=resume_header)
-            total_size = int(res.headers.get('content-length', 0))
-            pbar = tqdm(desc = desc,total=total_size,unit='B',unit_scale=True,bar_format = bar_format,position=0,initial=pos)
+            res = requests.get(url,stream=True,timeout=100,headers={'Accept-Encoding': None,'Range': f'bytes={pos}-'})
+            total_size = int(res.headers.get('content-length'))
+            pbar = tqdm(desc = desc,total=total_size,unit='B',unit_scale=True,bar_format = bar_format,position=0,initial=pos) 
             for chunk in res.iter_content(block_size):
                 pbar.update(len(chunk))
                 local_file.write(chunk)  
