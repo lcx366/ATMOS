@@ -12,6 +12,8 @@ from  .ussa76 import ussa76
 from ..utils import Const
 from ..utils.utils import alt_conver,check_altitude
 
+from ..class_atmos import ATMOS
+
 def coesa76(alts, alt_type='geometric'):
     '''
     Implements the U.S. Committee on Extension to the Standard Atmosphere(COESA 1976).
@@ -27,7 +29,7 @@ def coesa76(alts, alt_type='geometric'):
     Ts -> [float] temperatures ..., [K]
     Ps -> [float] pressures ..., [Pa]
     
-    Note: the geometric altitudes should be in [-0.610,1000] km, otherwise the output will be extrapolated for those input altitudes.
+    Note: the geometric altitudes should be in [-0.611,1000] km, otherwise the output will be extrapolated for those input altitudes.
 
     Reference: 
         U.S. Standard Atmosphere, 1976, U.S. Government Printing Office, Washington, D.C. 
@@ -43,7 +45,7 @@ def coesa76(alts, alt_type='geometric'):
     data = np.load(data_path+'coesa76_coeffs.npz')
     rho_coeffs,p_coeffs = data['rho'],data['p']
 
-    r0 = Const.r0 # volumetric radius for the Earth, [km] 
+    R0 = Const.R0 # volumetric radius for the Earth, [km] 
 
     # Get geometric and geopotential altitudes
     zs,hs = alt_conver(alts, alt_type)
@@ -67,7 +69,7 @@ def coesa76(alts, alt_type='geometric'):
             elif z > zb[3] and z <= zb[4]:
                 T = 240 + 12 * (z - 110)
             else:
-                epsilon = (z - 120) * (r0 + 120) / (r0 + z)
+                epsilon = (z - 120) * (R0 + 120) / (R0 + z)
                 T = 1e3 - 640 * np.exp(-0.01875 * epsilon)  
 
             ind = np.where((z - zb) >= 0)[0][-1]
@@ -81,5 +83,7 @@ def coesa76(alts, alt_type='geometric'):
 
         rhos[j],Ts[j],Ps[j] = rho,T,P
         j += 1    
+
+        info = {'rho':rhos,'T':Ts,'P':Ps}
  
-    return rhos,Ts,Ps             
+    return ATMOS(info)             

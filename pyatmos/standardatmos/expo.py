@@ -1,16 +1,15 @@
 import numpy as np
-
 from ..utils.utils import alt_conver,check_altitude
+
+from ..class_atmos import ATMOS
 
 def expo(alts,alt_type='geometric'):
     '''
-    Estimate the air densities at given geometric or geopotential altitudes 
-    above the sea level using a exponential atmosphere model from 
-    Vallado, D. A. (2013). Fundamentals of astrodynamics and applications (4th Edition). Microcosm Press.
+    Estimate the mass densities at given geometric or geopotential altitudes 
+    above the sea level using a exponential atmosphere model.
 
     Usage:
     rhos = expo(alts)
-    or
     rhos = expo(alts,'geopotential')
 
     Inputs:
@@ -23,7 +22,7 @@ def expo(alts,alt_type='geometric'):
     rhos -> [float array] densities at given altitudes, [kg/m^3]
 
     Reference:
-
+    Vallado, D. A. (2013). Fundamentals of astrodynamics and applications (4th Edition). Microcosm Press.
     '''
 
     # Get geometric and geopotential altitudes
@@ -57,6 +56,8 @@ def expo(alts,alt_type='geometric'):
 
     for i in range(len(zs)):
         inds[i] = np.where((zs[i] - zb_expand) >= 0)[0][-1]
-    rhos = rhob[inds]*np.exp(-(zs-zb[inds])/ZS[inds])    
+    rhos = rhob[inds]*np.exp(-(zs-zb[inds])/ZS[inds])  
+
+    info = {'rho':rhos}  
     
-    return rhos
+    return ATMOS(info)
