@@ -5,30 +5,22 @@ from pathlib import Path
 
 from ..utils.try_download import tqdm_request
 
-def download_sw(direc=None):
+def download_sw_nrlmsise00(direc=None):
     '''
-    Download or update the space weather file from www.celestrak.com
+    Download or update the space weather data from www.celestrak.com
 
     Usage: 
     swfile = download_sw([direc])
 
     Inputs: 
-    direc -> [str, optionanl, default = $HOME+'/src/sw-data/'] Directory for storing sw file
+    direc -> [str, optional] Directory for storing the space weather data
     
     Outputs: 
-    swfile -> [str] Path of sw file
+    swfile -> [str] Path of the space weather data
 
     Examples:
     >>> swfile = download_sw()
-    Downloading the latest space weather data ... Finished
-    >>> print(swfile)
-    /Users/lichunxiao/src/sw-data/SW-All.txt
     >>> swfile = download_sw('sw-data/')
-    Downloading the latest space weather data ... Finished
-    >>> swfile = download_sw('sw-data/')
-    The existing space weather data is already up to date
-    >>> print(swfile)
-    sw-data/SW-All.txt
     '''
     
     if direc is None:
@@ -40,30 +32,30 @@ def download_sw(direc=None):
 
     if not path.exists(direc): makedirs(direc)
     if not path.exists(swfile):
-        desc = 'Downloading the latest space weather data from CELESTRAK'
+        desc = 'Downloading the space weather data {:s} from CELESTRAK'.format('SW-All.txt')
         tqdm_request(url,direc,'SW-All.txt',desc)
     else:
         modified_time = datetime.fromtimestamp(path.getmtime(swfile))
         if datetime.now() > modified_time + timedelta(days=1):
             remove(swfile)
-            desc = 'Updating the space weather data from CELESTRAK'
+            desc = 'Updating the space weather data {:s} from CELESTRAK'.format('SW-All.txt')
             tqdm_request(url,direc,'SW-All.txt',desc)   
         else:
             print('The space weather data in {:s} is already the latest.'.format(direc))   
     return swfile
-
-def read_sw(swfile):
+ 
+def read_sw_nrlmsise00(swfile):
     '''
-    Parse and read the space weather file
+    Parse and read the space weather data
 
     Usage: 
     sw_obs_pre = read_sw(swfile)
 
     Inputs: 
-    swfile -> [str] Path of sw file
+    swfile -> [str] Path of the space weather data
     
     Outputs: 
-    sw_obs_pre -> [2d str array] sw data
+    sw_obs_pre -> [2d str array] Content of the space weather data
 
     Examples:
     >>> swfile = 'sw-data/SW-All.txt'
@@ -71,9 +63,8 @@ def read_sw(swfile):
     >>> print(sw_obs_pre)
     [['2020' '01' '07' ... '72.4' '68.0' '71.0']
     ['2020' '01' '06' ... '72.4' '68.1' '70.9']
-    ['2020' '01' '05' ... '72.4' '68.2' '70.9']
     ...
-    ['1957' '10' '03' ... '266.3' '268.1' '232.7']
+    ...
     ['1957' '10' '02' ... '253.3' '267.4' '231.7']
     ['1957' '10' '01' ... '269.3' '266.6' '230.9']]
     '''
@@ -102,24 +93,43 @@ def read_sw(swfile):
         if flag2 == 1: SW_PRE.append(line.split())    
     SW_OBS_PRE = np.vstack((np.array(SW_OBS),np.array(SW_PRE)))   
     # inverse sort
-    SW_OBS_PRE = np.flip(SW_OBS_PRE,0)
+    SW_OBS_PRE = np.flip(SW_OBS_PRE,0).astype(dtype='<U8')
+    ymds = np.apply_along_axis(''.join, 1, SW_OBS_PRE[:,:3])
+    SW_OBS_PRE = np.insert(SW_OBS_PRE[:,3:],0,ymds,axis=1)
     return SW_OBS_PRE 
-
+ 
 def get_sw(SW_OBS_PRE,t_ymd,hour):
     '''
-    Extract space weather data
+    Extract the necessary parameters describing the solar activity and geomagnetic activity from the space weather data.
+
+    Usage: 
+    f107A,f107,ap,aph = get_sw(SW_OBS_PRE,t_ymd,hour)
+
+    Inputs: 
+    SW_OBS_PRE -> [2d str array] Content of the space weather data
+    t_ymd -> [str array or list] ['year','month','day']
+    hour -> []
+    
+    Outputs: 
+    f107A -> [float] 81-day average of F10.7 flux
+    f107 -> [float] daily F10.7 flux for previous day
+    ap -> [int] daily magnetic index 
+    aph -> [float array] 3-hour magnetic index 
+
+    Examples:
+    >>> f107A,f107,ap,aph = get_sw(SW_OBS_PRE,t_ymd,hour)
     '''
-    j = 0
-    for ymd in SW_OBS_PRE[:,:3]:
-        if np.array_equal(t_ymd,ymd): break
-        j+=1 
-    f107A,f107,ap = float(SW_OBS_PRE[j,27]),float(SW_OBS_PRE[j+1,26]),int(SW_OBS_PRE[j,22])
-    aph_tmp_b0 = SW_OBS_PRE[j,14:22]   
+
+    ymds = SW_OBS_PRE[:,0]
+    j_, = np.where(''.join(t_ymd) == ymds)
+    j = j_[0]
+    f107A,f107,ap = float(SW_OBS_PRE[j,25]),float(SW_OBS_PRE[j+1,24]),int(SW_OBS_PRE[j,20])
+    aph_tmp_b0 = SW_OBS_PRE[j,12:20]   
     i = int(np.floor_divide(hour,3))
     ap_c = aph_tmp_b0[i]
-    aph_tmp_b1 = SW_OBS_PRE[j+1,14:22]
-    aph_tmp_b2 = SW_OBS_PRE[j+2,14:22]
-    aph_tmp_b3 = SW_OBS_PRE[j+3,14:22]
+    aph_tmp_b1 = SW_OBS_PRE[j+1,12:20]
+    aph_tmp_b2 = SW_OBS_PRE[j+2,12:20]
+    aph_tmp_b3 = SW_OBS_PRE[j+3,12:20]
     aph_tmp = np.hstack((aph_tmp_b3,aph_tmp_b2,aph_tmp_b1,aph_tmp_b0))[::-1].astype(np.float)
     apc_index = 7-i
     aph_c369 = aph_tmp[apc_index:apc_index+4]
