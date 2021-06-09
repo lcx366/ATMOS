@@ -32,16 +32,16 @@ def download_sw_nrlmsise00(direc=None):
 
     if not path.exists(direc): makedirs(direc)
     if not path.exists(swfile):
-        desc = 'Downloading the space weather data {:s} from CELESTRAK'.format('SW-All.txt')
+        desc = "Downloading the space weather data '{:s}' from CELESTRAK".format('SW-All.txt')
         tqdm_request(url,direc,'SW-All.txt',desc)
     else:
         modified_time = datetime.fromtimestamp(path.getmtime(swfile))
         if datetime.now() > modified_time + timedelta(days=1):
             remove(swfile)
-            desc = 'Updating the space weather data {:s} from CELESTRAK'.format('SW-All.txt')
+            desc = "Updating the space weather data '{:s}' from CELESTRAK".format('SW-All.txt')
             tqdm_request(url,direc,'SW-All.txt',desc)   
         else:
-            print('The space weather data {0:s} in {1:s} is already the latest.'.format('SW-All.txt',direc))   
+            print("The space weather data '{0:s}' in {1:s} is already the latest.".format('SW-All.txt',direc))   
     return swfile
  
 def read_sw_nrlmsise00(swfile):
