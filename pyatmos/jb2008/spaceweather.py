@@ -37,8 +37,8 @@ def download_sw_jb2008(direc=None):
 
     if not path.exists(direc): makedirs(direc)
     if not path.exists(swfile1):
-        desc1 = 'Downloading the space weather data {:s} from Space Environment Technologies(SET)'.format('SOLFSMY.TXT')
-        desc2 = 'Downloading the space weather data {:s} from Space Environment Technologies(SET)'.format('DTCFILE.TXT')
+        desc1 = "Downloading the space weather data '{:s}' from Space Environment Technologies(SET)".format('SOLFSMY.TXT')
+        desc2 = "Downloading the space weather data '{:s}' from Space Environment Technologies(SET)".format('DTCFILE.TXT')
         tqdm_request(url1,direc,'SOLFSMY.TXT',desc1)
         tqdm_request(url2,direc,'DTCFILE.TXT',desc2)
     else:
@@ -46,12 +46,12 @@ def download_sw_jb2008(direc=None):
         if datetime.now() > modified_time + timedelta(days=1):
             remove(swfile1)
             remove(swfile2)
-            desc1 = 'Updating the space weather data {:s} from Space Environment Technologies(SET)'.format('SOLFSMY.TXT')
-            desc2 = 'Updating the space weather data {:s} from Space Environment Technologies(SET)'.format('DTCFILE.TXT')
+            desc1 = "Updating the space weather data '{:s}' from Space Environment Technologies(SET)".format('SOLFSMY.TXT')
+            desc2 = "Updating the space weather data '{:s}' from Space Environment Technologies(SET)".format('DTCFILE.TXT')
             tqdm_request(url1,direc,'SOLFSMY.TXT',desc1)   
             tqdm_request(url2,direc,'DTCFILE.TXT',desc2)  
         else:
-            print('The space weather data {0:s} and {1:s} in {2:s} is already the latest.'.format('SOLFSMY.TXT','DTCFILE.TXT',direc))   
+            print("The space weather data '{0:s}' and '{1:s}' in {2:s} is already the latest.".format('SOLFSMY.TXT','DTCFILE.TXT',direc))   
     return [swfile1,swfile2]
  
 def read_sw_jb2008(swfile):
