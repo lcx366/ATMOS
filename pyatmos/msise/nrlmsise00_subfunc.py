@@ -2,7 +2,9 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 from pyshtools.legendre import PLegendreA,PlmIndex
 import pkg_resources
+from functools import lru_cache
 
+@lru_cache(maxsize=1)
 def nrlmsis00_data():
     '''
     Read the data block from nrlmsis00_data.npz
