@@ -2,7 +2,7 @@ from setuptools import setup,find_packages
 
 setup(
     name = 'pyatmos',
-    version = '1.2.3',
+    version = '1.2.4',
     description = 'A package to estimate the vertical structure of atmosphere with various atmospheric density models',
     author = 'Chunxiao Li',
     author_email = 'lcx366@126.com',
@@ -27,9 +27,9 @@ setup(
         'scipy',
         'numpy',
         'numba',
+        'pandas',
         'astropy',
         'pyshtools',
-        'tqdm',
-        'colorama'
+        'wget'
         ]
     )

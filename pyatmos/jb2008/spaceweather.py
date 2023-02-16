@@ -3,7 +3,7 @@ from datetime import datetime,timedelta
 from os import path,makedirs,remove
 from pathlib import Path
 
-from ..utils.try_download import tqdm_request
+from ..utils.try_download import wget_download
 from ..utils import Const
 
 def download_sw_jb2008(direc=None):
@@ -37,21 +37,21 @@ def download_sw_jb2008(direc=None):
 
     if not path.exists(direc): makedirs(direc)
     if not path.exists(swfile1):
-        desc1 = "Downloading the space weather data '{:s}' from Space Environment Technologies(SET)".format('SOLFSMY.TXT')
-        desc2 = "Downloading the space weather data '{:s}' from Space Environment Technologies(SET)".format('DTCFILE.TXT')
-        tqdm_request(url1,direc,'SOLFSMY.TXT',desc1)
-        tqdm_request(url2,direc,'DTCFILE.TXT',desc2)
+        desc1 = "Downloading the Space Weather file '{:s}' from Space Environment Technologies(SET)".format('SOLFSMY.TXT')
+        desc2 = "Downloading the Space Weather file '{:s}' from Space Environment Technologies(SET)".format('DTCFILE.TXT')
+        wget_download(url1,swfile1,desc1)
+        wget_download(url2,swfile2,desc2)
     else:
         modified_time = datetime.fromtimestamp(path.getmtime(swfile1))
         if datetime.now() > modified_time + timedelta(days=1):
             remove(swfile1)
             remove(swfile2)
-            desc1 = "Updating the space weather data '{:s}' from Space Environment Technologies(SET)".format('SOLFSMY.TXT')
-            desc2 = "Updating the space weather data '{:s}' from Space Environment Technologies(SET)".format('DTCFILE.TXT')
-            tqdm_request(url1,direc,'SOLFSMY.TXT',desc1)   
-            tqdm_request(url2,direc,'DTCFILE.TXT',desc2)  
+            desc1 = "Updating the Space weather data '{:s}' from Space Environment Technologies(SET)".format('SOLFSMY.TXT')
+            desc2 = "Updating the Space weather data '{:s}' from Space Environment Technologies(SET)".format('DTCFILE.TXT')
+            wget_download(url1,swfile1,desc1)
+            wget_download(url2,swfile2,desc2)
         else:
-            print("The space weather data '{0:s}' and '{1:s}' in {2:s} is already the latest.".format('SOLFSMY.TXT','DTCFILE.TXT',direc))   
+            print("The Space Weather files '{:s}' and '{:s}' in {:s} are already the latest.".format('SOLFSMY.TXT','DTCFILE.TXT',direc))   
     return [swfile1,swfile2]
  
 def read_sw_jb2008(swfile):

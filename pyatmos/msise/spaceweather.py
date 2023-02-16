@@ -1,9 +1,10 @@
 import numpy as np
 from datetime import datetime,timedelta
+import pandas as pd
 from os import path,makedirs,remove
 from pathlib import Path
 
-from ..utils.try_download import tqdm_request
+from ..utils.try_download import wget_download
 
 def download_sw_nrlmsise00(direc=None):
     '''
@@ -27,29 +28,29 @@ def download_sw_nrlmsise00(direc=None):
         home = str(Path.home())
         direc = home + '/src/sw-data/'
     
-    swfile = direc + 'SW-All.txt'
-    url = 'https://www.celestrak.com/SpaceData/SW-All.txt'
+    swfile = direc + 'SW-All.csv'
+    url = 'https://www.celestrak.com/SpaceData/SW-All.csv'
 
     if not path.exists(direc): makedirs(direc)
     if not path.exists(swfile):
-        desc = "Downloading the space weather data '{:s}' from CELESTRAK".format('SW-All.txt')
-        tqdm_request(url,direc,'SW-All.txt',desc)
+        desc = "Downloading the Space Weather file '{:s}' from CELESTRAK".format('SW-All.csv')
+        wget_download(url,swfile,desc)
     else:
         modified_time = datetime.fromtimestamp(path.getmtime(swfile))
-        if datetime.now() > modified_time + timedelta(days=1):
+        if datetime.now() > modified_time + timedelta(days=7):
             remove(swfile)
-            desc = "Updating the space weather data '{:s}' from CELESTRAK".format('SW-All.txt')
-            tqdm_request(url,direc,'SW-All.txt',desc)   
+            desc = "Updating the Space Weather file '{:s}' from CELESTRAK".format('SW-All.csv')
+            wget_download(url,swfile,desc)  
         else:
-            print("The space weather data '{0:s}' in {1:s} is already the latest.".format('SW-All.txt',direc))   
+            print("The Space Weather file '{:s}' in {:s} is already the latest.".format('SW-All.csv',direc))   
     return swfile
- 
+
 def read_sw_nrlmsise00(swfile):
     '''
     Parse and read the space weather data
 
     Usage: 
-    sw_obs_pre = read_sw(swfile)
+    sw_obs_pre = read_sw_nrlmsise00(swfile)
 
     Inputs: 
     swfile -> [str] Path of the space weather data
@@ -58,7 +59,7 @@ def read_sw_nrlmsise00(swfile):
     sw_obs_pre -> [2d str array] Content of the space weather data
 
     Examples:
-    >>> swfile = 'sw-data/SW-All.txt'
+    >>> swfile = 'sw-data/SW-All.csv'
     >>> sw_obs_pre = read_sw(swfile)
     >>> print(sw_obs_pre)
     [['2020' '01' '07' ... '72.4' '68.0' '71.0']
@@ -68,37 +69,14 @@ def read_sw_nrlmsise00(swfile):
     ['1957' '10' '02' ... '253.3' '267.4' '231.7']
     ['1957' '10' '01' ... '269.3' '266.6' '230.9']]
     '''
-    sw_data = open(swfile,'r').readlines()
-    SW_OBS,SW_PRE = [],[]
-    flag1 = flag2 = 0
-    for line in sw_data:
-        if line.startswith('BEGIN OBSERVED'): 
-            flag1 = 1
-            continue
-        if line.startswith('END OBSERVED'): flag1 = 0 
-        if flag1 == 1: 
-            sw_p = line.split()
-            if len(sw_p) == 30:
-                del sw_p[24]
-            elif len(sw_p) == 31: 
-                sw_p = np.delete(sw_p,[23,25]) 
-            else: 
-                sw_p = np.delete(sw_p,[23,24,25,27])
-            SW_OBS.append(sw_p)
-            
-        if line.startswith('BEGIN DAILY_PREDICTED'): 
-            flag2 = 1
-            continue    
-        if line.startswith('END DAILY_PREDICTED'): break 
-        if flag2 == 1: SW_PRE.append(line.split())    
-    SW_OBS_PRE = np.vstack((np.array(SW_OBS),np.array(SW_PRE)))   
-    # inverse sort
-    SW_OBS_PRE = np.flip(SW_OBS_PRE,0).astype(dtype='<U8')
-    ymds = np.apply_along_axis(''.join, 1, SW_OBS_PRE[:,:3])
-    SW_OBS_PRE = np.insert(SW_OBS_PRE[:,3:],0,ymds,axis=1)
-    return SW_OBS_PRE 
- 
-def get_sw(SW_OBS_PRE,t_ymd,hour):
+    sw_df = pd.read_csv(swfile)  
+    sw_df.dropna(subset=['C9'],inplace=True)
+    # Sort from newest date to past
+    sw_df.sort_values(by=['DATE'],ascending=False,inplace=True)
+    sw_df.reset_index(drop=True,inplace=True)
+    return sw_df
+
+def get_sw(sw_df,t_ymd,hour):
     '''
     Extract the necessary parameters describing the solar activity and geomagnetic activity from the space weather data.
 
@@ -120,17 +98,17 @@ def get_sw(SW_OBS_PRE,t_ymd,hour):
     >>> f107A,f107,ap,aph = get_sw(SW_OBS_PRE,t_ymd,hour)
     '''
 
-    ymds = SW_OBS_PRE[:,0]
-    j_, = np.where(''.join(t_ymd) == ymds)
+    ymds = sw_df['DATE']
+    j_, = np.where(sw_df['DATE'] == t_ymd)
     j = j_[0]
-    f107A,f107,ap = float(SW_OBS_PRE[j,25]),float(SW_OBS_PRE[j+1,24]),int(SW_OBS_PRE[j,20])
-    aph_tmp_b0 = SW_OBS_PRE[j,12:20]   
+    f107A,f107,ap = sw_df.iloc[j]['F10.7_OBS_CENTER81'],sw_df.iloc[j+1]['F10.7_OBS'],sw_df.iloc[j]['AP_AVG']
+    aph_tmp_b0 = sw_df.iloc[j]['AP1':'AP8']   
     i = int(np.floor_divide(hour,3))
     ap_c = aph_tmp_b0[i]
-    aph_tmp_b1 = SW_OBS_PRE[j+1,12:20]
-    aph_tmp_b2 = SW_OBS_PRE[j+2,12:20]
-    aph_tmp_b3 = SW_OBS_PRE[j+3,12:20]
-    aph_tmp = np.hstack((aph_tmp_b3,aph_tmp_b2,aph_tmp_b1,aph_tmp_b0))[::-1].astype(np.float)
+    aph_tmp_b1 = sw_df.iloc[j+1]['AP1':'AP8']
+    aph_tmp_b2 = sw_df.iloc[j+2]['AP1':'AP8']
+    aph_tmp_b3 = sw_df.iloc[j+3]['AP1':'AP8']
+    aph_tmp = np.hstack((aph_tmp_b3,aph_tmp_b2,aph_tmp_b1,aph_tmp_b0))[::-1]
     apc_index = 7-i
     aph_c369 = aph_tmp[apc_index:apc_index+4]
     aph_1233 = np.average(aph_tmp[apc_index+4:apc_index+12])

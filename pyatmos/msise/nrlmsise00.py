@@ -51,9 +51,8 @@ def nrlmsise00(t,location,SW_OBS_PRE,aphmode=True):
     alt = h
         
     t = Time(t)
-    lon_wrap = wraplon(lon)
+    t_ymd = t.isot.split('T')[0]
     t_yday = t.yday.split(':')
-    t_ymd = t.iso.split()[0].split('-')
     year,doy = int(t_yday[0]),int(t_yday[1])
     hour,sec = hms_conver(int(t_yday[2]),int(t_yday[3]),float(t_yday[4]))
     lst = hour + wraplon(lon)/15
@@ -62,6 +61,7 @@ def nrlmsise00(t,location,SW_OBS_PRE,aphmode=True):
     else:
         f107A,f107,ap,aph = 150,150,4,np.full(7,4)
 
+    lon_wrap = wraplon(lon)
     inputp = {'doy':doy,'year':year,'sec':sec,'alt':alt,'g_lat':lat,'g_lon':lon_wrap,'lst':lst,\
               'f107A':f107A,'f107':f107,'ap':ap,'ap_a':aph}
     

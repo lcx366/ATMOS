@@ -123,6 +123,10 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 ```
 
 ## Change log
+
+- **1.2.4 — Feb 16, 2023**
+  - Changed functions `read_sw_nrlmsise00` and `get_sw` due to the space weather file changed from 'SW-ALL.txt' to 'SW-ALL.csv'
+  - Deleted the colored-progress bar for downloading space weather file, and use `wget` instead.
 - **1.2.3 — Jun 7, 2021**
   - Added atmospheric models **JB2008**
   - Changed the output of the result to an instance
@@ -158,4 +162,3 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 - [poliastro-Atmosphere module](https://docs.poliastro.space/en/latest/autoapi/poliastro/earth/atmosphere/index.html?highlight=poliastro.earth.atmosphere)
 - [ATMOSPHERE API](https://amentum.com.au/atmosphere)
 - [COSPAR International Reference Atmosphere - 2012](https://spacewx.com/wp-content/uploads/2021/03/chapters_1_3.pdf)
-
