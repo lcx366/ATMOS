@@ -15,3 +15,7 @@ from .jb2008.spaceweather import download_sw_jb2008,read_sw_jb2008
 
 from .msise.nrlmsise00 import nrlmsise00
 from .jb2008.jb2008 import jb2008
+from .utils import data_prepare
+
+# Load and update the EOP file and Leap Second file
+data_prepare.iers_load() 
