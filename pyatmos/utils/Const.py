@@ -15,12 +15,10 @@ fourpi = 4*np.pi
 degrad = pi / 180
 al10 = np.log(10)
 
-# AVOGAD is Avogadro's number in mks units (molecules/kmol)
-avogad = 6.02257e26
+avogad = 6.02257e26 # The Avogadro's number in mks units (molecules/kmol)
 pivo2 = 1.5707963
 pivo4 = 1.5707963  
 
-# RSTAR is the universal gas-constant in mks units (joules/K/kmol)
-rstar = 8314.32
+rstar = 8314.32 # The universal gas-constant in mks units (joules/K/kmol)
 
 x = np.arange(0.5,48)/24
