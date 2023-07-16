@@ -123,7 +123,8 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 ```
 
 ## Change log
-
+- **1.2.5 — Jul 16, 2023**
+  - Added time system for loading/updating the EOP file and Leap Second file from IERS
 - **1.2.4 — Feb 16, 2023**
   - Changed functions `read_sw_nrlmsise00` and `get_sw` due to the space weather file changed from 'SW-ALL.txt' to 'SW-ALL.csv'
   - Deleted the colored-progress bar for downloading space weather file, and use `wget` instead.
