@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import CubicSpline
-from pyshtools.legendre import PLegendreA,PlmIndex
+from scipy.special import lpmv
 import pkg_resources
 
 def nrlmsis00_data():
@@ -275,9 +275,30 @@ def sg0(ex,p,ap):
                 g0(ap[6],p)*ex**12)*(1-ex**8)/(1-ex))/sumex(ex)
 
 # =============== 3hr magnetic activity functions =================== #
+def PLegendreA(lmax, x):
+    """
+    Calculates all unnormalized associated Legendre polynomials up to degree lmax for a given x value.
+
+    Inputs:
+        lmax -> [int] The maximum degree of the polynomials to compute.
+        x -> [float] The value at which to evaluate the polynomials.
+    Outputs:
+        res -> [array-like] An array of shape (lmax + 1) * (lmax + 2) // 2 containing the values of the unnormalized associated Legendre polynomials P_l^m(x) for l = 0, 1, ..., lmax and m = 0, 1, ..., l.
+    Note: The Condon-Shortley phase is excluded.    
+    """
+    res = np.zeros((lmax + 1) * (lmax + 2) // 2)
+
+    # Compute P_l^m(x) for all l and m
+    k = 0
+    for l in range(lmax + 1):
+        for m in range(l + 1):
+            res_k = lpmv(m, l, x)
+            if m%2: res_k *= -1
+            res[k] = res_k
+            k += 1
+    return res
 
 def lengendre(g_lat,lmax = 8):
-    # Index of PLegendreA_x can be calculated by PlmIndex(l,m)
     x = np.sin(np.deg2rad(g_lat))
     PLegendreA_x = PLegendreA(lmax,x)
     return PLegendreA_x

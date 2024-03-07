@@ -123,24 +123,26 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 ```
 
 ## Change log
+- **1.2.6 — Mar 08, 2024**
+  - Implemented the calculation of Associated Legendre polynomials using `scipy`, eliminating the dependency on the `pyshtools` package.
 - **1.2.5 — Jul 16, 2023**
-  - Added time system for loading/updating the EOP file and Leap Second file from IERS
+  - Added time system for loading/updating the EOP file and Leap Second file from IERS.
 - **1.2.4 — Feb 16, 2023**
-  - Changed functions `read_sw_nrlmsise00` and `get_sw` due to the space weather file changed from 'SW-ALL.txt' to 'SW-ALL.csv'
+  - Changed functions `read_sw_nrlmsise00` and `get_sw` due to the space weather file changed from 'SW-ALL.txt' to 'SW-ALL.csv'.
   - Deleted the colored-progress bar for downloading space weather file, and use `wget` instead.
 - **1.2.3 — Jun 7, 2021**
   - Added atmospheric models **JB2008**
-  - Changed the output of the result to an instance
-  - Improved the code structure for NRLMSISE-00, and the running speed is nearly threefold
+  - Changed the output of the result to an instance.
+  - Improved the code structure for NRLMSISE-00, and the running speed is nearly threefold.
 - **1.2.1 — Jan 22, 2021**
-  - Added **Exponential Atmosphere** up to 1000 km
-  - Added **Committee on Extension to the Standard Atmosphere(COESA)** up to 1000 km
-  - Completed part of the help documentation for NRLMSISE-00
-  - Improved the code structure to make it easier to read
+  - Added **Exponential Atmosphere** up to 1000 km.
+  - Added **Committee on Extension to the Standard Atmosphere(COESA)** up to 1000 km.
+  - Completed part of the help documentation for NRLMSISE-00.
+  - Improved the code structure to make it easier to read.
 - **1.1.2 — Jul 26, 2020**
-  - Added colored-progress bar for downloading data
+  - Added colored-progress bar for downloading data.
 - **1.1.0 — Mar 29,  2020**
-  - Added the International Standard Atmosphere(ISA) Model up to 86kms  
+  - Added the International Standard Atmosphere(ISA) Model.  
 
 ## Next release
 
