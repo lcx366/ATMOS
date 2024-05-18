@@ -2,7 +2,9 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 from scipy.special import lpmv
 import pkg_resources
+from functools import lru_cache
 
+@lru_cache(maxsize=1)
 def nrlmsis00_data():
     '''
     Read the data block from nrlmsis00_data.npz
@@ -303,10 +305,11 @@ def lengendre(g_lat,lmax = 8):
     PLegendreA_x = PLegendreA(lmax,x)
     return PLegendreA_x
 
-def globe7(p,inputp,flags):
+def globe7_old(p,inputp,flags):
     '''
     Calculate G(L) function 
     '''
+    import math
     t = np.zeros(15)
     sr = 7.2722E-5
     dr = 1.72142E-2
@@ -430,6 +433,137 @@ def globe7(p,inputp,flags):
     for i in range(14):
         tinf = tinf + np.abs(flags['sw'][i])*t[i]    
     return tinf,[dfa,plg,ctloc,stloc,c2tloc,s2tloc,s3tloc,c3tloc,apdf,apt]   
+
+def globe7(p,inputp,flags):
+    '''
+    Calculate G(L) function (slightly faster than globe7_old)
+    '''
+    import math
+    t = np.zeros(15)
+    sr = 7.2722E-5
+    dr = 1.72142E-2
+    hr = 0.2618
+    
+    apdf = 0
+    apt = np.zeros(4)
+    tloc = inputp['lst']
+
+    if not (flags['sw'][6]==0 and flags['sw'][7]==0 and flags['sw'][13]==0):
+        stloc,ctloc = math.sin(hr*tloc),math.cos(hr*tloc)
+        s2tloc,c2tloc = math.sin(2*hr*tloc),math.cos(2*hr*tloc)
+        s3tloc,c3tloc = math.sin(3*hr*tloc),math.cos(3*hr*tloc)
+    cd32 = math.cos(dr*(inputp['doy'] - p[31]))
+    cd18 = math.cos(2*dr*(inputp['doy'] - p[17]))
+    cd14 = math.cos(dr*(inputp['doy'] - p[13]))
+    cd39 = math.cos(2*dr*(inputp['doy'] - p[38]))
+
+    # F10.7 effect 
+    df = inputp['f107'] - inputp['f107A']
+    dfa = inputp['f107A'] - 150
+    t[0] =  p[19]*df*(1 + p[59]*dfa) + p[20]*df**2 + p[21]*dfa + p[29]*dfa**2
+    f1 = 1 + (p[47]*dfa + p[19]*df + p[20]*df**2)*flags['swc'][0]
+    f2 = 1 + (p[49]*dfa + p[19]*df + p[20]*df**2)*flags['swc'][0]
+    
+    plg = lengendre(inputp['g_lat'])
+
+    #  time independent 
+    t[1] = p[1]*plg[3] + p[2]*plg[10] + p[22]*plg[21] + p[14]*plg[3]*dfa*flags['swc'][0] + p[26]*plg[1]
+    
+    # symmetrical annual
+    t[2] = p[18]*cd32
+
+    # symmetrical semiannual
+    t[3] = (p[15] + p[16]*plg[3])*cd18
+
+    # asymmetrical annual
+    t[4] = f1*(p[9]*plg[1] + p[10]*plg[6])*cd14
+
+    # asymmetrical semiannual 
+    t[5] = p[37]*plg[1]*cd39
+    
+    # diurnal 
+    if flags['sw'][6]:
+        t71 = p[11]*plg[4]*cd14*flags['swc'][4]
+        t72 = p[12]*plg[4]*cd14*flags['swc'][4]
+        t[6] = f2*((p[3]*plg[2] + p[4]*plg[7] + p[27]*plg[16] + t71) * ctloc + (p[6]*plg[2] + p[7]*plg[7] + p[28]*plg[16] + t72)*stloc)
+    
+    # semiannual 
+    if flags['sw'][7]:
+        t81 = (p[23]*plg[8] + p[35]*plg[17])*cd14*flags['swc'][4]
+        t82 = (p[33]*plg[8] + p[36]*plg[17])*cd14*flags['swc'][4]
+        t[7] = f2*((p[5]*plg[5] + p[41]*plg[12] + t81)*c2tloc +(p[8]*plg[5] + p[42]*plg[12] + t82)*s2tloc)
+
+    # terdiurnal
+    if flags['sw'][13]:
+        t[13] = f2*((p[39]*plg[9] + (p[93]*plg[13] + p[46]*plg[24])*cd14*flags['swc'][4])*s3tloc + (p[40]*plg[9]+(p[94]*plg[13] + p[48]*plg[24])*cd14*flags['swc'][4])*c3tloc)
+    
+    # magnetic activity based on daily ap 
+    if flags['sw'][8] == -1:
+        ap = inputp['ap_a']
+        if p[51]!= 0:
+            exp1 = math.exp(-10800*abs(p[51])/(1 + p[138]*(45 - abs(inputp['g_lat']))))
+            if exp1 > 0.99999: exp1 = 0.99999
+            if p[24] < 1E-4: p[24] = 1E-4
+            apt[0] = sg0(exp1,p,ap)
+            # apt[1] = sg2(exp1,p,ap)
+            # apt[2] = sg0(exp2,p,ap)
+            # apt[3] = sg2(exp2,p,ap)
+
+            if flags['sw'][8]:
+                t[8] = apt[0]*(p[50] + p[96]*plg[3] + p[54]*plg[10] + \
+                       (p[125]*plg[1] + p[126]*plg[6] + p[127]*plg[15])*cd14*flags['swc'][4] + \
+                       (p[128]*plg[2] + p[129]*plg[7] + p[130]*plg[16])*flags['swc'][6]*math.cos(hr*(tloc - p[131])))
+    else:
+        apd = inputp['ap'] - 4
+        p44 = p[43]
+        p45 = p[44]
+        if p44 < 0: p44 = 1E-5
+        apdf = apd + (p45 - 1)*(apd + (math.exp(-p44*apd) - 1)/p44)
+        if flags['sw'][8]:
+            t[8]=apdf*(p[32] + p[45]*plg[3] + p[34]*plg[10] + \
+     (p[100]*plg[1] + p[101]*plg[6] + p[102]*plg[15])*cd14*flags['swc'][4] +
+     (p[121]*plg[2] + p[122]*plg[7] + p[123]*plg[16])*flags['swc'][6]*math.cos(hr*(tloc - p[124])))
+
+    if flags['sw'][9] and inputp['g_lon'] > -1000:
+        # longitudinal
+        if flags['sw'][10]:
+            t[10] = (1 + p[80]*dfa*flags['swc'][0])*((p[64]*plg[4] + p[65]*plg[11] + p[66]*plg[22]\
+                    + p[103]*plg[2] + p[104]*plg[7] + p[105]*plg[16]\
+                    + flags['swc'][4]*(p[109]*plg[2] + p[110]*plg[7] + p[111]*plg[16])*cd14)*math.cos(math.radians(inputp['g_lon'])) \
+                    +(p[90]*plg[4]+p[91]*plg[11]+p[92]*plg[22] + p[106]*plg[2]+p[107]*plg[7]+p[108]*plg[16]\
+                    + flags['swc'][4]*(p[112]*plg[2] + p[113]*plg[7] + p[114]*plg[16])*cd14)*math.sin(math.radians(inputp['g_lon'])))
+
+        # ut and mixed ut, longitude 
+        if flags['sw'][11]:
+            t[11]=(1 + p[95]*plg[1])*(1 + p[81]*dfa*flags['swc'][0])*\
+            (1 + p[119]*plg[1]*flags['swc'][4]*cd14)*\
+            ((p[68]*plg[1] + p[69]*plg[6] + p[70]*plg[15])*math.cos(sr*(inputp['sec'] - p[71])))
+            t[11] += flags['swc'][10]*(p[76]*plg[8] + p[77]*plg[17] + p[78]*plg[30])*\
+            math.cos(sr*(inputp['sec'] - p[79]) + 2*math.radians(inputp['g_lon']))*(1 + p[137]*dfa*flags['swc'][0])
+            
+        # ut, longitude magnetic activity 
+        if flags['sw'][10]:
+            if flags['sw'][8] == -1:
+                if p[51]:
+                    t[12] = apt[0]*flags['swc'][10]*(1 + p[132]*plg[1])*\
+                    ((p[52]*plg[4] + p[98]*plg[11] + p[67]*plg[22])* math.cos(math.radians(inputp['g_lon'] - p[97])))\
+                    + apt[0]*flags['swc'][10]*flags['swc'][4]*(p[133]*plg[2] + p[134]*plg[7] + p[135]*plg[16])*\
+                    cd14*math.cos(math.radians(inputp['g_lon'] - p[136])) + apt[0]*flags['swc'][11]* \
+                    (p[55]*plg[1] + p[56]*plg[6] + p[57]*plg[15])*math.cos(sr*(inputp['sec'] - p[58]))
+            else:
+                t[12] = apdf*flags['swc'][10]*(1 + p[120]*plg[1])*((p[60]*plg[4] + p[61]*plg[11] + p[62]*plg[22])*\
+                    math.cos(math.radians(inputp['g_lon']-p[63])))+apdf*flags['swc'][10]*flags['swc'][4]* \
+                    (p[115]*plg[2] + p[116]*plg[7] + p[117]*plg[16])* \
+                    cd14*math.cos(math.radians(inputp['g_lon'] - p[118])) \
+                    + apdf*flags['swc'][11]*(p[83]*plg[1] + p[84]*plg[6] + p[85]*plg[15])* math.cos(sr*(inputp['sec'] - p[75]))
+
+    # parms not used: 82, 89, 99, 139-149 
+    tinf = p[30]
+    tinf += np.sum(np.abs(np.array(flags['sw'])[:14])*t[:14])
+    # for i in range(14):
+    #     tinf = tinf + abs(flags['sw'][i])*t[i]    
+    return tinf,[dfa,plg,ctloc,stloc,c2tloc,s2tloc,s3tloc,c3tloc,apdf,apt]   
+
 
 def glob7s(p,inputp,flags,varli):
     pset = 2
