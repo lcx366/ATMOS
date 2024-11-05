@@ -2,7 +2,7 @@ from setuptools import setup,find_packages
 
 setup(
     name = 'pyatmos',
-    version = '1.2.6',
+    version = '1.2.7',
     description = 'A package to estimate the vertical structure of atmosphere with various atmospheric density models',
     author = 'Chunxiao Li',
     author_email = 'lcx366@126.com',

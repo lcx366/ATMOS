@@ -123,6 +123,9 @@ pip install pyatmos --upgrade # to upgrade a pre-existing installation
 ```
 
 ## Change log
+
+- **1.2.7 — Nov 05, 2024**
+  - By dynamically setting environment variables *ENABLE_IERS_LOAD*, the problem of repeatedly loading IERS data files when other packages call this package is fixed.
 - **1.2.6 — Mar 08, 2024**
   - Implemented the calculation of Associated Legendre polynomials using `scipy`, eliminating the dependency on the `pyshtools` package.
 - **1.2.5 — Jul 16, 2023**
